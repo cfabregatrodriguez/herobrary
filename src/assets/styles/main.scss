@@ -1,0 +1,8 @@
+// src/assets/styles/main.scss
+@use "./variables" as *;
+@use "./overrides" as *;
+
+// Estilos globales adicionales
+body {
+  background-color: var(--v-background-base);
+}

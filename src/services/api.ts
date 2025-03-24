@@ -2,7 +2,7 @@ export const API_KEY = import.meta.env.VITE_API_KEY;
 
 export async function getListCharacters(batchSize = 10) {
   const characters = [];
-  const totalCharacters = 10;
+  const totalCharacters = 30;
 
   for (let i = 1; i <= totalCharacters; i += batchSize) {
     const idsBatch = Array.from({ length: batchSize }, (_, j) => i + j).filter(id => id <= totalCharacters);

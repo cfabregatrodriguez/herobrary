@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import Characters from './components/Characters.vue'
+import CharactersMain from './components/CharactersMain.vue'
 </script>
 
 <template>
-  <Characters/>
+  <CharactersMain/>
 </template>
 
 <style scoped>

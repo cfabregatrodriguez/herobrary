@@ -1,16 +1,48 @@
 <template>
-  <div>
-    <h1>Superheroes</h1>
-    <ul>
-      <li v-for="character in characters" :key="character.id">
-        <h3>{{ character.name }}</h3>
-        <img :src="character.image.url" alt="Character Image" />
-        <p><strong>Full name:</strong> {{ character.biography["full-name"] }}</p>
-        <p><strong>First appearance:</strong> {{ character.biography["first-appearance"] }}</p>
-        <p><strong>Alignment:</strong> {{ character.biography.alignment }}</p>
-      </li>
-    </ul>
-  </div>
+  <v-container>
+    <h1 class="text-center">Superhéroes</h1>
+
+    <v-row>
+      <v-col
+        v-for="character in characters"
+        :key="character.id"
+        cols="12"
+        sm="6"
+        md="4"
+        lg="3"
+      >
+        <v-card
+          class="mx-auto"
+          :elevation="selectedCharacters.includes(character.id) ? 10 : 2"
+          :color="selectedCharacters.includes(character.id) ? 'primary' : 'white'"
+          @click="toggleSelection(character.id)"
+        >
+          <v-img
+            :src="character.image.url"
+            height="250px"
+            cover
+          ></v-img>
+
+          <v-card-title>{{ character.name }}</v-card-title>
+
+          <v-card-subtitle>{{ character.biography["full-name"] }}</v-card-subtitle>
+
+          <v-card-text>
+            <p><strong>Primera aparición:</strong> {{ character.biography["first-appearance"] }}</p>
+            <p><strong>Alineación:</strong> {{ character.biography.alignment }}</p>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-checkbox
+              v-model="selectedCharacters"
+              :value="character.id"
+              hide-details
+            ></v-checkbox>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -21,25 +53,36 @@ export default defineComponent({
   name: "Characters",
   setup() {
     const characters = ref<any[]>([]);
+    const selectedCharacters = ref<string[]>([]); // Guarda los IDs de los seleccionados
 
     onMounted(async () => {
-        const data = await getListCharacters();
-
-        // Si data es un array válido y tiene al menos un elemento
-        if (Array.isArray(data) && data.length > 0 && data[0]?.id) {
-            characters.value = data; // Asigna los datos correctamente
-        } else {
-            console.error('Error en la respuesta de la API o no se encontraron resultados', data);
-        }
+      const data = await getListCharacters();
+      if (Array.isArray(data) && data.length > 0 && data[0]?.id) {
+        characters.value = data;
+      } else {
+        console.error("Error en la respuesta de la API o no se encontraron resultados", data);
+      }
     });
+
+    const toggleSelection = (id: string) => {
+      if (selectedCharacters.value.includes(id)) {
+        selectedCharacters.value = selectedCharacters.value.filter((charId) => charId !== id);
+      } else {
+        selectedCharacters.value.push(id);
+      }
+    };
 
     return {
       characters,
+      selectedCharacters,
+      toggleSelection,
     };
   },
 });
 </script>
 
 <style scoped>
-/* Agrega tus estilos aquí */
+.text-center {
+  text-align: center;
+}
 </style>
