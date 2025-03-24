@@ -7,6 +7,13 @@
         :toggleSelection="toggleSelection" 
     />
 
+    <v-text-field 
+        v-model="searchQuery" 
+        label="Search character..." 
+        prepend-inner-icon="mdi-magnify"
+        clearable
+    ></v-text-field>
+
     <v-pagination
         v-model="page"
         :length="totalPages"
@@ -45,17 +52,26 @@ export default defineComponent({
         const selectedCharacters = ref([]);
         const page = ref(1);
         const itemsPerPage = 20; // Número de elementos por página
+        const searchQuery = ref(""); // Estado para la búsqueda
 
-        // Total de páginas
-        const totalPages = computed(() => {
-            return Math.ceil(characters.value.length / itemsPerPage);
+        // Filtrar personajes según el término de búsqueda
+        const filteredCharacters = computed(() => {
+            if (!searchQuery.value.trim()) return characters.value;
+            return characters.value.filter(character =>
+                character.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+            );
         });
 
-         // Filtrar personajes según la página actual
+        // Total de páginas basadas en los personajes filtrados
+        const totalPages = computed(() => {
+            return Math.ceil(filteredCharacters.value.length / itemsPerPage);
+        });
+
+        // Filtrar personajes según la página actual
         const paginatedCharacters = computed(() => {
             const start = (page.value - 1) * itemsPerPage;
             const end = page.value * itemsPerPage;
-            return characters.value.slice(start, end);
+            return filteredCharacters.value.slice(start, end);
         });
 
         // Manejar el cambio de página
@@ -64,17 +80,14 @@ export default defineComponent({
         };
 
         const toggleSelection = (character) => {
-            // Verificamos si el personaje ya está seleccionado
             const index = selectedCharacters.value.indexOf(character);
             if (index > -1) {
-                // Si el personaje ya está seleccionado, lo eliminamos
                 selectedCharacters.value.splice(index, 1);
             } else {
-                // Si no está seleccionado, lo agregamos
                 if (selectedCharacters.value.length < 4) {
-                selectedCharacters.value.push(character);
+                    selectedCharacters.value.push(character);
                 } else {
-                alert("Solo puedes seleccionar hasta 4 personajes.");
+                    alert("Solo puedes seleccionar hasta 4 personajes.");
                 }
             }
         };
@@ -85,7 +98,7 @@ export default defineComponent({
 
         onMounted(async () => {
             const data = await getListCharacters();
-            console.log("datos recibidos en characterMain: ", data);  // Agrega este log para ver qué datos estás recibiendo
+            console.log("datos recibidos en characterMain: ", data);
             if (Array.isArray(data) && data.length > 0) {
                 characters.value = data;
             } else {
@@ -98,6 +111,7 @@ export default defineComponent({
             toggleSelection,
             isSelected,
             page,
+            searchQuery, // Añadir al return para usar en la plantilla
             totalPages,
             paginatedCharacters,
             onPageChange
