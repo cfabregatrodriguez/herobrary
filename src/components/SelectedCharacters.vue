@@ -5,7 +5,7 @@
             <v-card 
                 @click="toggleSelection(character)"
                 class="mx-auto" 
-                :prepend-avatar="character.image?.url" 
+                :prepend-avatar="character.imagexs" 
                 :subtitle="character.name" 
             >
             </v-card>

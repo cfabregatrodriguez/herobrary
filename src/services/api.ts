@@ -1,28 +1,21 @@
-export const API_KEY = import.meta.env.VITE_API_KEY;
+const API_URL = "https://akabab.github.io/superhero-api/api/all.json";
 
-export async function getListCharacters(batchSize = 10) {
-  const characters = [];
-  const totalCharacters = 30;
+export async function getListCharacters() {
+  try {
+    const response = await fetch(API_URL);
+    if (!response.ok) {
+      throw new Error(`Error al obtener personajes: ${response.statusText}`);
+    }
 
-  for (let i = 1; i <= totalCharacters; i += batchSize) {
-    const idsBatch = Array.from({ length: batchSize }, (_, j) => i + j).filter(id => id <= totalCharacters);
-    const batchRequests = idsBatch.map(id =>
-      fetch(`/api/${API_KEY}/${id}`)
-        .then(responseBatchRequests => responseBatchRequests.json())
-        .then(data => {
-          if (data && data.response === 'success' && data.id) {
-            return data; // Solo retornar si la respuesta es válida
-          }
-          return null; // Devolver null si no es válida
-        })
-        .catch(error => {
-          return null; // En caso de error, devolver null
-        })
-    );
-
-    const resultadosLote = await Promise.all(batchRequests);
-    characters.push(...resultadosLote.filter(character => character !== null)); // Filtrar nulos
+    const data = await response.json();
+    return data.map((character: any) => ({
+      id: character.id,
+      name: character.name,
+      image: character.images.md, // Imagen en tamaño medio
+      imagexs: character.images.xs, // Imagen en tamaño pequeño
+    }));
+  } catch (error) {
+    console.error("Error en getListCharacters:", error);
+    return [];
   }
-
-  return characters;
 }
