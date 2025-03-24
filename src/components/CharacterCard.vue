@@ -1,5 +1,5 @@
 <template>
-    <v-card @click="toggleSelection(character)" :class="{'selected': isSelected}" class="mx-auto" :style="{ minHeight: '300px', width: '100%' }">
+    <v-card :class="{'selected': isSelected}" class="mx-auto" :style="{ minHeight: '300px', width: '100%' }">
         <v-img :src="character.image.url" alt="Character Image" 
             cover
             style="height: 200px; width: 100%;"
@@ -11,6 +11,14 @@
         <v-card-subtitle v-else>
             {{ character.name }}
         </v-card-subtitle>
+        <template v-slot:actions>
+            <div class="d-flex justify-center align-center w-100">
+                <v-btn variant="tonal" @click="toggleSelection(character)">
+                    <span v-if="isSelected">Remove</span>
+                    <span v-else>Add to fight</span>    
+                </v-btn>
+            </div>
+        </template>
     </v-card>
 </template>
 
