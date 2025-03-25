@@ -52,7 +52,13 @@
     <p>Cargando personaje...</p>
   </div>
 
-  <BarFight />
+
+  <BarFight 
+        :speed=speed
+        :penalty=penalty
+        :bonus=bonus
+        :coloredZones="coloredZones" 
+        :minibarraWidth="minibarraWidth" />
 </template>
 
 <script>
@@ -68,6 +74,7 @@ export default defineComponent({
     BarFight
   },
   setup() {
+
     const character = ref(null);
     const route = useRoute();
     const characterId = route.params.id;
@@ -117,6 +124,90 @@ export default defineComponent({
       return Math.round(average * 10) / 10;
     });
 
+    // Computed para calcular el ancho de la barra
+    const minibarraWidth = computed(() => {
+      if (!character.value) return 20;
+      const intelligence = character.value.powerstats.intelligence;
+      const factor = 3; 
+      return Math.max(5, Math.min(50, (100 - intelligence) / factor));
+    });
+
+    // Computed para calcular la penalizacion cuando pulsas fuera de las zonas de color
+    const penalty = computed(() => {
+      if (!character.value) return 4;
+      const durability = character.value.powerstats.durability;
+
+      // formula lineal para penalty el valor aumenta cuando la durability es menor
+      let penaltyValue = 1 + ((100 - durability) / 90) * 9;
+      
+      // Aseguramos que penalty no sea mayor que 10
+      return penaltyValue > 10 ? 10 : penaltyValue;
+    });
+
+    // Computed para calcular el bonus cuando pulsas dentro de las zonas de color
+    const bonus = computed(() => {
+      if (!character.value) return 1;
+      const strength = character.value.powerstats.strength;
+
+      // formula lineal para bonus, el valor de bonus aumenta cuando la strength aumenta
+      return 1 + (strength - 30) / 70;
+    });
+
+    // Computed para calcular las coloredZones
+    // mayor es la caracteristica de combate mayor el numero de zonas
+    // mayor es la caracteristica de poder más anchas son las zonas
+    const coloredZones = computed(() => {
+      if (!character.value) return []; // Si no hay personaje cargado, no generamos zonas
+
+      const combat = character.value.powerstats.combat;
+      const power = character.value.powerstats.power;
+
+      const maxTotalWidth = 290; // El máximo ancho permitido para todas las zonas
+      let numZones = Math.max(1, Math.floor(combat / 20)); // Número de zonas basado en el valor de combat
+
+      const baseWidthFactor = Math.max(20, power); // El ancho base de cada zona depende de power
+      const spaceBetweenFactor = 20; 
+
+      // Calcular el total de espacio que ocuparán las zonas con el ancho base y los espacios entre ellas
+      let totalBaseWidth = baseWidthFactor * numZones + spaceBetweenFactor * (numZones - 1);
+
+      // Si el total base excede el máximo, eliminamos zonas hasta que se cumpla la condición
+      while (totalBaseWidth > maxTotalWidth && numZones > 1) {
+        numZones--; // Eliminamos una zona
+        totalBaseWidth = baseWidthFactor * numZones + spaceBetweenFactor * (numZones - 1); // Recalculamos el total
+      }
+
+      const widthFactor = baseWidthFactor;
+
+      // Generar las zonas
+      let zones = [];
+      let start = 10; // Empezamos desde la posición 10
+
+      for (let i = 0; i < numZones; i++) {
+        const zoneWidth = i === numZones - 1 ? widthFactor : widthFactor; // La última zona es igual a las anteriores
+
+        // Añadimos la zona con su posición de inicio y su ancho
+        zones.push({ start: start, width: zoneWidth });
+
+        // Incrementar el start teniendo en cuenta el ancho de la zona y el espacio entre ellas
+        start += zoneWidth + spaceBetweenFactor;
+      }
+
+      return zones;
+    });
+
+
+    // Computed para calcular la velocidad de la minibarra
+    const speed = computed(() => {
+      if (!character.value) return 1; 
+
+      const speedValue = character.value.powerstats.speed;
+      const factor = 0.02;
+      const expSpeed = Math.exp((75 - speedValue/1.5) * factor); 
+
+      return expSpeed;
+    });
+
     // Computed para saber si el personaje está seleccionado
     const isSelected = computed(() => {
       return selectedCharactersStore.selectedCharacters.some(
@@ -147,7 +238,12 @@ export default defineComponent({
       isSelected,
       toggleSelection,
       averagePower,
-      averagePowerReal
+      averagePowerReal,
+      speed,
+      penalty,
+      bonus,
+      coloredZones,
+      minibarraWidth
     };
   }
 });
