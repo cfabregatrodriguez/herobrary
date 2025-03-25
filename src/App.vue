@@ -1,22 +1,41 @@
-<script setup lang="ts">
-import CharactersMain from './components/CharactersMain.vue'
-</script>
-
 <template>
-  <CharactersMain/>
+  <v-app>
+    <div  class="pa-16">
+      <h1>HEROBRARY</h1>
+      <SelectedCharacters 
+          :selectedCharacters="selectedCharactersStore.selectedCharacters" 
+          :toggleSelection="toggleSelection" 
+      />
+      <router-view></router-view>
+    </div>
+  </v-app>
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
+<script lang="ts">
+  import { defineComponent } from "vue";
+  import { useSelectedCharactersStore } from "@/stores/selectedCharactersStore";
+  import SelectedCharacters from "@/components/SelectedCharacters.vue";
+  export default defineComponent({
+    name: "App",
+    components: {
+      SelectedCharacters
+    },
+    setup() {
+      const selectedCharactersStore = useSelectedCharactersStore();
+      // La función toggleSelection se puede pasar como prop al componente SelectedCharacters
+      const toggleSelection = (character: any) => {
+        const isSelected = selectedCharactersStore.isCharacterSelected(character);
+        if (isSelected) {
+          selectedCharactersStore.removeCharacter(character);
+        } else {
+          selectedCharactersStore.addCharacter(character);
+        }
+      };
+
+      return {
+        selectedCharactersStore,
+        toggleSelection
+      };
+    }
+  });
+</script>

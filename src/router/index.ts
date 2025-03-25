@@ -1,12 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import CharacterDetail from '@/views/CharacterDetail.vue';  // Vista de detalle para un personaje
+import CharactersMain from '@/views/CharactersMain.vue';  // Vista de detalle para un personaje
 
 const routes = [
   {
-    path: '/character/:id',  // Ruta dinámica para el detalle del personaje
+    path: '/',  // Ruta para la página principal
+    name: 'CharactersMain',
+    component: CharactersMain,
+  },
+  {
+    path: '/character/:id',// Ruta dinámica para el detalle del personaje
     name: 'CharacterDetail',
-    component: CharacterDetail,
-    props: true,  // Pasar el parámetro de ID como prop a la vista
+    component: CharacterDetail
   },
 ];
 

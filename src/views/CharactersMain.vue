@@ -1,12 +1,5 @@
 <template>
   <div>
-    <h1>Superheroes</h1>
-    
-    <SelectedCharacters 
-        :selectedCharacters="selectedCharacters" 
-        :toggleSelection="toggleSelection" 
-    />
-
     <v-text-field 
         v-model="searchQuery" 
         label="Search character..." 
@@ -32,27 +25,38 @@
         />
       </v-col>
     </v-row>
+
+    <v-pagination
+        v-model="page"
+        :length="totalPages"
+        @input="onPageChange"
+        :show-prev-next="true"
+        :total-visible="7"
+        class="my-4"
+    ></v-pagination>
+
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, ref, computed } from "vue";
+import { useSelectedCharactersStore } from "@/stores/selectedCharactersStore";
 import { getListCharacters } from "@/services/api";
 import CharacterCard from "@/components/CharacterCard.vue";
-import SelectedCharacters from "@/components/SelectedCharacters.vue";
 
 export default defineComponent({
     name: "CharacterList",
     components: {
         CharacterCard,
-        SelectedCharacters,
     },
     setup() {
         const characters = ref<any[]>([]);
-        const selectedCharacters = ref([]);
         const page = ref(1);
-        const itemsPerPage = 20; // Número de elementos por página
+        const itemsPerPage = 24; // Número de elementos por página
         const searchQuery = ref(""); // Estado para la búsqueda
+
+        // Acceder a la store de Pinia
+        const selectedCharactersStore = useSelectedCharactersStore();
 
         // Filtrar personajes según el término de búsqueda
         const filteredCharacters = computed(() => {
@@ -79,21 +83,17 @@ export default defineComponent({
             console.log("Página actual:", page.value);
         };
 
-        const toggleSelection = (character) => {
-            const index = selectedCharacters.value.indexOf(character);
-            if (index > -1) {
-                selectedCharacters.value.splice(index, 1);
+        const toggleSelection = (character: any) => {
+            const isSelected = selectedCharactersStore.isCharacterSelected(character);
+            if (isSelected) {
+                selectedCharactersStore.removeCharacter(character);
             } else {
-                if (selectedCharacters.value.length < 4) {
-                    selectedCharacters.value.push(character);
-                } else {
-                    alert("Solo puedes seleccionar hasta 4 personajes.");
-                }
+                selectedCharactersStore.addCharacter(character);
             }
         };
 
         const isSelected = (character: any) => {
-            return selectedCharacters.value.includes(character);
+            return selectedCharactersStore.isCharacterSelected(character);
         };
 
         onMounted(async () => {
@@ -107,7 +107,6 @@ export default defineComponent({
         });
 
         return {
-            selectedCharacters,
             toggleSelection,
             isSelected,
             page,

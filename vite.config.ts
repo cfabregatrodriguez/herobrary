@@ -9,16 +9,5 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
-  },
-  server: {
-    https: false, 
-    proxy: {
-      '/api': {
-        target: 'https://www.superheroapi.com/api/',
-        changeOrigin: true,
-        secure: false,  // Cambia a `true` si la API usa HTTPS
-        rewrite: (path) => path.replace(/^\/api/, ''),  // Esto reemplaza `/api` por nada
-      },
-    },
-  },
+  }
 });
