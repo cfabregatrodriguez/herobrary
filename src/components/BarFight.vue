@@ -1,5 +1,26 @@
 <template>
   <div class="pa-4 d-flex flex-column align-center">
+    <div class="hb-ball">
+      <svg viewBox="0 0 200 200" class="wave" :style="{
+         transform: 'scale(' + (1 + parseInt(counter)/5) + ')'
+       }">
+        <defs>
+          <filter id="waveFilter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="5" result="turbulence">
+              <animate 
+                attributeName="baseFrequency" 
+                values="0.015; 0.03; 0.015" 
+                dur="10s" 
+                keyTimes="0; 0.5; 1" 
+                keySplines="0.25 0.8 0.25 1" 
+                repeatCount="indefinite" />
+            </feTurbulence>
+            <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="10"/>
+          </filter>
+        </defs>
+        <circle cx="100" cy="100" r="80" filter="url(#waveFilter)"/>
+      </svg>
+    </div>
     <v-progress-linear :style="{ width: barWidth + 'px', height: '20px', position: 'relative' }" class="rounded-pill"
       color="grey lighten-1" background-color="grey darken-3">
       <div v-for="(zone, index) in props.coloredZones" :key="index" :style="{
@@ -14,8 +35,8 @@
         class="bg-blue-grey-darken-3"
        :style="{
         position: 'absolute',
-        left: minibarraPos + 'px',
-        width: props.minibarraWidth + 'px',
+        left: minibarPos + 'px',
+        width: props.minibarWidth + 'px',
         height: '100%'
       }"></div>
     </v-progress-linear>
@@ -29,15 +50,15 @@
 <p>speed: {{ props.speed }}</p>
 <p>nº zones: {{ props.coloredZones.length }}</p>
 <p>width zones: {{ props.coloredZones[0] }}</p>
-<p>bar width: {{ props.minibarraWidth }}</p>
+<p>bar width: {{ props.minibarWidth }}</p>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, computed, onMounted, onUnmounted, defineProps } from "vue";
   // Recibimos los valores como props
   const props = defineProps({
-    minibarraWidth: {
+    minibarWidth: {
       type: Number,
       default: 10
     },
@@ -67,22 +88,22 @@
   const counter = ref(0);
   const direction = ref(1);
   const isHolding = ref(false);
-  const minibarraPos = ref(0);
+  const minibarPos = ref(0);
   let interval;
   let holdTimer;
   const holdTime = ref(0); // Tiempo acumulado en milisegundos
 
   const isInsideColoredZone = computed(() => {
     return props.coloredZones.some(zone =>
-      // Verificamos si toda la minibarra está completamente dentro de la zona
-      minibarraPos.value >= zone.start && 
-      minibarraPos.value + props.minibarraWidth <= zone.start + zone.width
+      // Verificamos si toda la minibar está completamente dentro de la zona
+      minibarPos.value >= zone.start && 
+      minibarPos.value + props.minibarWidth <= zone.start + zone.width
     );
   });
 
-  const moveMinibarra = () => {
-    minibarraPos.value += props.speed * direction.value;
-    if (minibarraPos.value + props.minibarraWidth >= barWidth || minibarraPos.value <= 0) {
+  const moveMinibar = () => {
+    minibarPos.value += props.speed * direction.value;
+    if (minibarPos.value + props.minibarWidth >= barWidth || minibarPos.value <= 0) {
       direction.value *= -1;
     }
   };
@@ -131,7 +152,7 @@
   };
 
   onMounted(() => {
-    interval = setInterval(moveMinibarra, 16);
+    interval = setInterval(moveMinibar, 16);
   });
 
   onUnmounted(() => {

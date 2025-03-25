@@ -1,6 +1,9 @@
 // src/assets/styles/main.scss
-@use "./variables" as *;
-@use "./overrides" as *;
+@use "./abstracts/variables" as *;
+@use "./vuetify/overrides" as *;
+
+@use "./components/BarStat" as *;
+@use "./components/BarFight" as *;
 
 // Estilos globales adicionales
 body {

@@ -1,7 +1,9 @@
 <template>
   <v-app>
     <div  class="pa-16">
-      <h1>HEROBRARY</h1>
+      <router-link to="/">
+        <h1>HEROBRARY</h1>
+      </router-link>
       <SelectedCharacters 
           :selectedCharacters="selectedCharactersStore.selectedCharacters" 
           :toggleSelection="toggleSelection" 
