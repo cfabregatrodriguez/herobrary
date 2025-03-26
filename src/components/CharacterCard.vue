@@ -2,12 +2,18 @@
   <v-card
     :class="{
       selected: isSelected,
-      'bg-blue-grey-lighten-4': isSelected
+      'bg-blue-grey-lighten-1': isSelected
     }"
     class="mx-auto"
     :style="{ minHeight: '300px', width: '100%' }"
     @click="goToCharacterDetail"
   >
+    <v-badge v-if="isSelected"
+        class="hb-card__badge"
+        color="white"
+        content="selected"
+        inline
+    ></v-badge>
     <v-img
       :src="character.images.md"
       alt="Character Image"
@@ -15,20 +21,13 @@
       style="height: 200px; width: 100%;"
     />
     <v-card-title>{{ character.name }}</v-card-title>
-    <v-card-subtitle v-if="character.biography.fullName">
-      {{ character.biography.fullName }}
-    </v-card-subtitle>
-    <v-card-subtitle v-else>
-      {{ character.name }}
-    </v-card-subtitle>
-    <template v-slot:actions>
-      <div class="d-flex justify-center align-center w-100">
-        <v-btn variant="tonal" @click.stop="toggleSelection(character)">
-          <span v-if="isSelected">Remove</span>
-          <span v-else>Add to fight</span>
+    <div class="d-flex justify-center align-center w-100 pb-4">
+        <v-btn variant="tonal" size="small" @click.stop="toggleSelection(character)">
+            <span v-if="isSelected">Remove</span>
+            <span v-else>Add to fight</span>
         </v-btn>
-      </div>
-    </template>
+    </div>
+    <v-card-subtitle class="py-2" v-text="character.biography.fullName || character.name" />
   </v-card>
 </template>
 

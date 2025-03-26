@@ -14,10 +14,11 @@
         :show-prev-next="true"
         :total-visible="7"
         class="my-4"
+        size="small"
     ></v-pagination>
 
     <v-row>
-      <v-col v-for="character in paginatedCharacters" :key="character.id" cols="6" sm="4" md="2">
+      <v-col v-for="character in paginatedCharacters" :key="character.id" cols="6" sm="4" md="2" class="pa-1">
         <CharacterCard
           :character="character"
           :isSelected="isSelected(character)"
@@ -33,6 +34,7 @@
         :show-prev-next="true"
         :total-visible="7"
         class="my-4"
+        size="small"
     ></v-pagination>
   </div>
 </template>

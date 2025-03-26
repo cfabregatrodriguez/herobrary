@@ -4,8 +4,15 @@
 
 @use "./components/BarStat" as *;
 @use "./components/BarFight" as *;
+@use "./components/EnergyBall" as *;
 
 // Estilos globales adicionales
 body {
   background-color: var(--v-background-base);
+}
+
+.permanent-marker-regular {
+  font-family: "Permanent Marker", cursive;
+  font-weight: 400;
+  font-style: normal;
 }

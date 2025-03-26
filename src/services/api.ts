@@ -1,5 +1,3 @@
-import axios from "axios";
-
 const API_URL = "https://akabab.github.io/superhero-api/api/";
 
 export async function getListCharacters() {
