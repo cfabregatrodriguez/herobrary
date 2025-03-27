@@ -4,14 +4,14 @@
             <v-col cols="4" class="pt-0 pr-0">
                 <div class="d-sm-flex">
                     <CharacterCardFight :character="character" characterNum="1" />
-                    <EnergyBall :counter="counter" :bgColor="'#3498db'" @updateCounter="handleCounterChange" />
+                    <EnergyBall :character="character" @divisionPassed="handleDivisionPassed" :counter="counter" :bgColor="'#3498db'" :flash="flash1" @updateCounter="handleCounterChange" @filled="handleFilled" />
                 </div>
                 <BarFight :character="character" :counter="counter" :bgColor="'#3498db'"
                     :isCountdownActive="isCountdownActive" @updateCounter="handleCounterChange" />
             </v-col>
             <v-col class="d-sm-flex align-center justify-center">
                 <div>
-                    <Countdown v-show="isCountdownActive" class="mb-8" ref="countdownRef" :maxCount="3"
+                    <Countdown v-show="isCountdownActive" class="mb-8" ref="countdownRef" :maxCount="20"
                         @finished="handleFinish" />
                     <v-btn v-show="!isCountdownActive" class="mt-8" @click="startCountdown" size="x-large">Start</v-btn>
                     <div v-show="!isCountdownActive" class="ma-8">
@@ -23,7 +23,7 @@
             </v-col>
             <v-col cols="4" class="pt-0 pl-0">
                 <div class="d-sm-flex">
-                    <EnergyBall :counter="counter2" @updateCounter="handleCounterChange2" />
+                    <EnergyBall :character="character2" @divisionPassed="handleDivisionPassed2" :counter="counter2" :flash="flash2" @updateCounter="handleCounterChange2" @filled="handleFilled2" />
                     <CharacterCardFight :character="character2" characterNum="2" />
                 </div>
                 <BarFight :character="character2" :counter="counter2" @updateCounter="handleCounterChange2"
@@ -38,6 +38,7 @@
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { getCharacter } from "@/services/api";
+import { Character } from '@/models/character.model';
 
 // Components
 import EnergyBall from "@/components/EnergyBall.vue";
@@ -45,15 +46,16 @@ import BarFight from "@/components/BarFight.vue";
 import CharacterCardFight from "@/components/CharacterCardFight.vue";
 import Countdown from "@/components/Countdown.vue";
 
-// Models & Types
-import { Character } from '@/models/character.model';
-
 // Reactive state  
 const counter = ref(0);
 const counter2 = ref(0);
 const character = ref<Character | null>(null);
 const character2 = ref<Character | null>(null);
 const countdownRef = ref();
+const flash1 = ref(false);
+const flash2 = ref(false);
+const totalBarsPassed = ref(0);
+const totalBarsPassed2 = ref(0);
 
 // Estado para saber si la cuenta atrás está activa
 const isCountdownActive = ref(false);
@@ -72,6 +74,26 @@ const handleCounterChange = (value: number) => {
 const handleCounterChange2 = (value: number) => {
     counter2.value = value;
     if (counter2.value < 0) counter2.value = 0; // Asegurar que no sea negativo
+};
+
+// Win logic
+const handleFilled = () => {
+    flash1.value = true;
+};
+
+const handleFilled2 = () => {
+    flash2.value = true;
+};
+
+// Bar passed logic
+const handleDivisionPassed = (passedBars: number) => {
+    totalBarsPassed.value = passedBars;
+    console.log("character 1", passedBars);
+};
+
+const handleDivisionPassed2 = (passedBars: number) => {
+    totalBarsPassed.value = passedBars;
+    console.log("character 2", passedBars);
 };
 
 // Countdown  logic 

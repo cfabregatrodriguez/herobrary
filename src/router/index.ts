@@ -16,7 +16,7 @@ const routes = [
   },
   {
     path: '/fight/:id/:vs',// Ruta dinámica para el detalle del personaje
-    name: 'CharactersFight',
+    name: 'Fight',
     component: CharactersFight
   },
 ];

@@ -41,14 +41,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch  } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { useSelectedCharactersStore } from "@/stores/selectedCharactersStore";
 import { getListCharacters } from "@/services/api";
 import CharacterCard from "@/components/CharacterCard.vue";
 
+const route = useRoute();
+const router = useRouter();
+
 // Reactive variables
 const characters = ref<any[]>([]);
-const page = ref(1);
+const page = ref(Number(route.query.page) || 1);
 const itemsPerPage = 24; // Número de elementos por página
 const searchQuery = ref(""); // Estado para la búsqueda
 
@@ -92,6 +96,10 @@ const toggleSelection = (character: any) => {
 const isSelected = (character: any) => {
   return selectedCharactersStore.isCharacterSelected(character);
 };
+
+watch(page, (newPage) => {
+    router.replace({ query: { ...route.query, page: newPage } });
+});
 
 // Cargar los datos de los personajes cuando se monta el componente
 onMounted(async () => {

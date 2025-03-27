@@ -8,9 +8,8 @@
 </template>
 
 <script setup lang="ts">
-    import { Character } from '@/models/character.model';
-
     import BarStat from "@/components/BarStat.vue";
+    import { Character } from '@/models/character.model';
 
     // Recibir las propiedades del componente
     const props = defineProps<{

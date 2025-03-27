@@ -14,9 +14,10 @@
         position: absolute;
         bottom: 5px;
         left: 5px;
-        width: 90px;
-        height: 460px;
-        background: linear-gradient(to bottom right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0), rgba(255, 255, 255, 0), rgba(255, 255, 255, .8));
+        width: 50px;
+        height: calc(100% - 10px);
+        background: linear-gradient(to bottom right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0), rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3), rgba(255, 255, 255, .5));
+        // transform: rotate(1deg);
         z-index: 9999;
     }
     &:after {
@@ -35,7 +36,7 @@
     svg {
         position: absolute;
         bottom: -30px;
-        left: -50px;
+        left: -25px;
         transform-origin: bottom;
         transition: transform 0.2s ease-in-out;
         height: calc(100% + 30px);

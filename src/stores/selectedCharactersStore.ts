@@ -7,14 +7,14 @@ export const useSelectedCharactersStore = defineStore('selectedCharacters', {
 
   actions: {
     addCharacter(character: any) {
-      if (this.selectedCharacters.length < 4) {
+      if (this.selectedCharacters.length < 2) {
         // Agregar al array usando el ID como referencia
         if (!this.selectedCharacters.some(item => item.id === character.id)) {
           this.selectedCharacters.push(character);
           localStorage.setItem('selectedCharacters', JSON.stringify(this.selectedCharacters));
         }
       } else {
-        alert("Solo puedes seleccionar hasta 4 personajes.");
+        alert("Only 2 characters can be selected.");
       }
     },
 
