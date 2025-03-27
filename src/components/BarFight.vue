@@ -1,277 +1,283 @@
 <template>
-  <div class="pa-4 d-flex flex-column align-center" v-if="character">
-    <v-progress-linear :style="{ width: barWidth + 'px', height: '20px', position: 'relative' }" class="rounded-pill"
-      color="grey lighten-1" background-color="grey darken-3">
-      <div v-for="(zone, index) in coloredZones" :key="index" :style="{
-        position: 'absolute',
-        left: zone.start + 'px',
-        width: zone.width + 'px',
-        height: '100%',
-        backgroundColor: bgColor
-      }"></div>
+  <div class="hb-barfight d-flex flex-column align-center" v-if="character">
+    <v-progress-linear 
+      ref="progressBarRef"
+      class="position-relative"
+      style="width: 100%; height: 20px;"
+      color="grey lighten-1"
+    >
+      <!-- Zonas de color -->
+      <template v-for="(zone, index) in coloredZones" :key="index">
+        <div class="position-absolute"
+          :style="{
+            left: zone.start + 'px',
+            width: zone.width + 'px',
+            height: '30px',
+            backgroundColor: bgColor
+          }">
+        </div>
+      </template>
 
+      <!-- Minibar -->
       <div 
-        class="bg-blue-grey-darken-3"
-       :style="{
-        position: 'absolute',
-        left: minibarPos + 'px',
-        width: minibarWidth + 'px',
-        height: '100%',
-        opacity: isHolding ? '0.5' : '1'
-      }"></div>
+        class="hb-barfight__minibar position-absolute"
+        :style="{
+          left: minibarPos + 'px',
+          width: minibarWidth + 'px',
+          height: '100%',
+          opacity: isHolding ? 0.5 : 1
+        }"
+      ></div>
     </v-progress-linear>
-    <div class="pa-6">
-      <v-btn @mousedown="startHold" @mouseup="stopHold" @mouseleave="stopHold" icon="mdi-flare" size="x-large">
-      </v-btn>
-    </div>
-    <p>Contador: {{ counter }}</p>
-    <p>bonus: {{ bonus }}</p>
-    <p>penalty: {{ penalty }}</p>
-    <p>speed: {{ speed }}</p>
-    <p>nº zones: {{ coloredZones.length }}</p>
-    <p>width zones: {{ coloredZones[0] }}</p>
-    <p>bar width: {{ minibarWidth }}</p>
+
+    <!-- Información -->
+    <p>Contador: {{ Math.round(counter * 10) / 10 }}</p>
+    <p>Bonus: {{ Math.round(bonus * 10) / 10 }}</p>
+    <p>Penalty: {{ Math.round(penalty * 10) / 10 }}</p>
+    <p>Speed: {{ Math.round(speed * 10) / 10 }}</p>
+    <p>Nº zones: {{ coloredZones.length }}</p>
+    <p>Width zones: {{ Math.round(coloredZones[0]?.width * 10) / 10 }}</p>
+    <p>Bar width: {{ Math.round(minibarWidth * 10) / 10 }}</p>
   </div>
+
   <div v-else>
     <p>Character not available, loading...</p>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, onMounted, onUnmounted} from "vue";
+import { ref, computed, onMounted, onUnmounted, nextTick } from "vue";
 
-  // Recibir la propiedad "character" del componente padre
-  const props = defineProps({
-    character: {
-      type: Object,
-      required: false
-    },
-    bgColor: {
-      type: String,
-      default: 'red'
-    },
-    isAuto: { 
-      type: Boolean, 
-      default: false 
-    }
+// Props
+const props = defineProps({
+  character: { type: Object, required: false },
+  bgColor: { type: String, default: "red" },
+  isAuto: { type: Boolean, default: false },
+  isCountdownActive: { type: Boolean, default: false },
+});
+
+const emit = defineEmits<{
+  (event: "updateCounter", value: number): void;
+}>();
+
+// Refs
+const barWidth = ref(0);
+const maxTotalWidth = ref(0); 
+const progressBarRef = ref<HTMLElement | null>(null);
+const baseHoldInterval = 50;
+const counter = ref(0);
+const direction = ref(1);
+const isHolding = ref(false);
+const minibarPos = ref(0);
+let intervalAutoClicks: number;
+let interval: number;
+let holdTimer: number;
+const holdTime = ref(0);
+
+// === Funciones de cálculo ===
+
+// Calcular PowerZone
+function calculatePowerZone(power: number, maxWidth: number) {
+  return {
+    width: (power / 100) * (0.4 * maxWidth)
+  };
+}
+
+// Calcular CombatZones
+function calculateCombatZones(combat: number, maxWidth: number) {
+  const combatZones: { width: number }[] = [];
+  if (combat <= 20) combatZones.push({ width: 0.05 * maxWidth });
+  else if (combat <= 50) combatZones.push({ width: 0.5 * maxWidth });
+  else if (combat <= 80) combatZones.push({ width: 0.10 * maxWidth }, { width: 0.15 * maxWidth });
+  else if (combat <= 99) combatZones.push({ width: 0.15 * maxWidth }, { width: 0.20 * maxWidth });
+  else if (combat === 100) combatZones.push({ width: 0.30 * maxWidth });
+  
+  return combatZones;
+}
+
+// Calcular las zonas completas
+function calculateZones(power: number, combat: number, maxWidth: number) {
+  const powerZone = calculatePowerZone(power, maxWidth);
+  const combatZones = calculateCombatZones(combat, maxWidth);
+  const allZones = [powerZone, ...combatZones];
+  const totalZonesWidth = allZones.reduce((sum, zone) => sum + zone.width, 0);
+  const remainingSpace = maxWidth - totalZonesWidth;
+  const spaceSize = remainingSpace / (allZones.length + 1);
+  
+  let currentPosition = spaceSize;
+  return allZones.map(zone => {
+    const z = { start: currentPosition, width: zone.width };
+    currentPosition += zone.width + spaceSize;
+    return z;
   });
+}
 
+// === Computed ===
 
-  const barWidth = 300;
-  const baseHoldInterval = 100; // Tiempo base en milisegundos
-  const counter = ref(0);
-  const direction = ref(1);
-  const isHolding = ref(false);
-  const minibarPos = ref(0);
-  let intervalAutoClicks;
-  let interval;
-  let holdTimer;
-  const holdTime = ref(0); // Tiempo acumulado en milisegundos
-
-  // Definir los eventos que se van a emitir
-  const emit = defineEmits<{
-    (event: 'updateCounter', value: number): void;
-  }>();
-
-  const isInsideColoredZone = computed(() => {
-    return coloredZones.value.some(zone =>
-      // Verificamos si toda la minibar está completamente dentro de la zona
-      minibarPos.value >= zone.start && 
+const isInsideColoredZone = computed(() =>
+  coloredZones.value.some(
+    (zone) =>
+      minibarPos.value >= zone.start &&
       minibarPos.value + minibarWidth.value <= zone.start + zone.width
-    );
-  });
+  )
+);
 
-  const moveMinibar = () => {
-    minibarPos.value += speed.value * direction.value;
-    if (minibarPos.value + minibarWidth.value >= barWidth || minibarPos.value <= 0) {
-      direction.value *= -1;
-    }
-  };
+// coloredZones ahora usa la función calculateZones
+const coloredZones = computed(() => {
+  if (!props.character || maxTotalWidth.value <= 1) return [];
 
-  const updateHold = () => {
-    if (!isHolding.value) return;
+  const { combat, power } = props.character.powerstats;
+  return calculateZones(power, combat, maxTotalWidth.value);
+});
 
-    holdTime.value += 10; // Acumulamos tiempo cada 10ms
+// Computed para la velocidad
+const speed = computed(() => {
+  if (!props.character) return 1;
+  return Math.exp((75 - props.character.powerstats.speed / 1.5) * 0.02);
+});
 
-    // Calculamos la aceleración exponencial de la velocidad
-    const intervalSpeed = Math.max(5, baseHoldInterval * Math.exp(-holdTime.value / 1000));
+// Computed para el ancho de la minibarra
+const minibarWidth = computed(() => {
+  if (!props.character) return 20;
+  return Math.max(5, Math.min(40, (130 - props.character.powerstats.intelligence) / 3));
+});
 
-    if (isInsideColoredZone.value) {
-      counter.value += bonus.value;
-    } else {
-      counter.value -= penalty.value;
-    }
+// Computed para penalty
+const penalty = computed(() => {
+  if (!props.character) return 4;
+  return Math.min(10, 1 + ((100 - props.character.powerstats.durability) / 90) * 9);
+});
 
+// Computed para bonus
+const bonus = computed(() => {
+  if (!props.character) return 1;
+  return 1 + props.character.powerstats.strength / 50;
+});
+
+// === Funciones de actualización ===
+
+// Update Bar Width
+const updateBarWidth = () => {
+  if (progressBarRef.value) {
+    const element = progressBarRef.value.$el ?? progressBarRef.value;
+    maxTotalWidth.value = progressBarRef.value.offsetWidth;
+    barWidth.value = element.clientWidth;
+  }
+};
+
+// Update Width
+const updateWidth = () => {
+  if (progressBarRef.value) {
+    maxTotalWidth.value = progressBarRef.value.$el.offsetWidth || 1; 
+  }
+};
+
+// Mover minibarra
+const moveMinibar = () => {
+  minibarPos.value += speed.value * direction.value;
+  if (minibarPos.value + minibarWidth.value >= barWidth.value || minibarPos.value <= 0) {
+    direction.value *= -1;
+  }
+};
+
+// Actualizar Hold
+const updateHold = () => {
+  if (!props.isCountdownActive) return;  // No actualizar el contador si el countdown no está activo
+  if (!isHolding.value) return;
+
+  // Limpiar el intervalo anterior
+  clearInterval(holdTimer);
+  // Si no estamos dentro de la zona, reiniciar el intervalSpeed al valor base
+  const intervalSpeed = isInsideColoredZone.value 
+    ? Math.max(10, baseHoldInterval * Math.exp(-holdTime.value / 1000))  // Normal behavior
+    : baseHoldInterval;  // Reset intervalSpeed to base value if not inside colored zone
+
+  // Actualizar el contador según si estamos dentro o fuera de la zona
+  counter.value += isInsideColoredZone.value ? bonus.value : -penalty.value;
+  counter.value = Math.max(counter.value, 0);  // Asegurarse que el contador no sea negativo
+  emit("updateCounter", counter.value);
+
+  // Limpiar el intervalo anterior
+  clearInterval(holdTimer);
+
+  // Establecer un nuevo intervalo con el intervalSpeed actualizado
+  holdTimer = setInterval(updateHold, intervalSpeed);
+};
+
+const startHold = () => {
+  if (!props.isCountdownActive) return;  // Solo continuar si el countdown está activo
+  if (!isHolding.value) {
+    isHolding.value = true;
+    holdTime.value = 0;
+
+    counter.value += isInsideColoredZone.value ? bonus.value : -penalty.value;
     counter.value = Math.max(counter.value, 0);
-    emit('updateCounter', counter.value);
+    emit("updateCounter", counter.value);
 
-    // Reiniciamos el temporizador con la nueva velocidad
+    // Limpiar el intervalo anterior
     clearInterval(holdTimer);
-    holdTimer = setInterval(updateHold, intervalSpeed);
-  };
 
-  const startHold = () => {
-    if (!isHolding.value) {
-      isHolding.value = true;
-      holdTime.value = 0;
-      
-      //aumentamos el counter si hacemos un click por pequeño que sea asi nos aseguramos de que siempre aumentara en cuanto hacemos click en una zona correcta sin esperar los 100ms de baseHoldInterval
-      if (isInsideColoredZone.value) {
-        counter.value += bonus.value;
-      } else {
-        counter.value -= penalty.value;
-      }
+    holdTimer = setInterval(updateHold, baseHoldInterval);
+  }
+};
 
-      counter.value = Math.max(counter.value, 0);
-      emit('updateCounter', counter.value);
+const stopHold = () => {
+  if (!props.isCountdownActive) return;  // Detener solo si el countdown está activo
+  isHolding.value = false;
 
-      holdTimer = setInterval(updateHold, baseHoldInterval); // Comenzamos con el tiempo base
-    }
-  };
+  clearInterval(holdTimer);
+};
 
-  const stopHold = () => {
-    isHolding.value = false;
-    clearInterval(holdTimer);
-  };
+// === Eventos de teclado ===
+const handleKeyDown = (event: KeyboardEvent) => {
+  if (!props.isCountdownActive) return;  // Solo permite comenzar si el countdown está activo
+  if (event.code === "Space") {
+    event.preventDefault();
+    startHold();
+  }
+};
 
-  // Otros computados
-  const minibarWidth = computed(() => {
-    if (!props.character) return 20;
-    const intelligence = props.character.powerstats.intelligence;
-    const factor = 3; 
-    return Math.max(5, Math.min(40, (130 - intelligence) / factor));
-  });
+const handleKeyUp = (event: KeyboardEvent) => {
+  if (!props.isCountdownActive) return;  // Solo permite detener si el countdown está activo
+  if (event.code === "Space") {
+    event.preventDefault();
+    stopHold();
+  }
+};
 
-  const penalty = computed(() => {
-    if (!props.character) return 4;
-    const durability = props.character.powerstats.durability;
-    let penaltyValue = 1 + ((100 - durability) / 90) * 9;
-    return penaltyValue > 10 ? 10 : penaltyValue;
-  });
+// === Lifecycle Hooks ===
+onMounted(() => {
+  nextTick(updateBarWidth);
+  nextTick(updateWidth);
+  window.addEventListener("resize", updateBarWidth);
 
-  const bonus = computed(() => {
-    if (!props.character) return 1;
-    const strength = props.character.powerstats.strength;
-    return 1 + (strength) / 10;
-  });
+  interval = setInterval(moveMinibar, 12);
 
-  const coloredZones = computed(() => {
-
-    if (!props.character) return []; // Si no hay personaje, devolvemos un array vacío
-
-    const combat = props.character.powerstats.combat;
-    const power = props.character.powerstats.power;
-    const speed = props.character.powerstats.speed;
-
-    const maxTotalWidth = 290;
-
-    // Determinar el número de zonas según combat
-    let numZones;
-
-    if (combat <= 10) numZones = 5;
-    else if (combat <= 50) numZones = 3;
-    else if (combat <= 90) numZones = 2;
-    else numZones = 1;
-
-    // `power` define el ancho total antes de repartirlo
-    let totalBaseWidth = Math.min(maxTotalWidth, Math.max(100, power * 2));
-
-    // Definir el espacio entre zonas en función de combat (a más combat, más espacio)
-    let minSpacing = 5; // Espaciado mínimo
-    let maxSpacing = 30; // Espaciado máximo
-    let spaceBetweenFactor = minSpacing + ((combat / 100) * (maxSpacing - minSpacing));
-
-    // Calcular el ancho de cada zona ajustando el espaciado
-    let totalSpacing = spaceBetweenFactor * (numZones - 1);
-    let availableWidth = totalBaseWidth - totalSpacing;
-    let zoneWidth = availableWidth / numZones;
-
-    // Si el total sobrepasa el máximo, reajustar el espacio entre zonas
-    while (totalBaseWidth > maxTotalWidth && spaceBetweenFactor > minSpacing) {
-      spaceBetweenFactor -= 1;
-      totalSpacing = spaceBetweenFactor * (numZones - 1);
-      availableWidth = totalBaseWidth - totalSpacing;
-      zoneWidth = availableWidth / numZones;
-    }
-
-    // Calcular el desplazamiento inicial basado en speed
-    let minStart = 10;  // Mínima posición de inicio
-    let maxStart = 100; // Máxima posición de inicio
-    let start = minStart + ((100 - speed) / 100) * (maxStart - minStart);
-
-    let zones = [];
-
-    for (let i = 0; i < numZones; i++) {
-      zones.push({ start: start, width: zoneWidth });
-      start += zoneWidth + spaceBetweenFactor;
-    }
-    // Asegúrate de que siempre se devuelve un array, aunque esté vacío
-    return Array.isArray(zones) ? zones : [];
-  });
-
-  const speed = computed(() => {
-    if (!props.character) return 1; 
-    const speedValue = props.character.powerstats.speed;
-    const factor = 0.02;
-    return Math.exp((75 - speedValue / 1.5) * factor);
-  });
-
-  const handleClick = () => {
-    counter.value += 1;
-    emit('updateCounter', counter.value);
-    // Aquí podrías agregar la lógica de actualización del estado
-  };
-
-  const handleErrorClick = () => {
-    counter.value -= 1;
-    emit('updateCounter', counter.value);
-    // Aquí podrías agregar la lógica de actualización del estado
-  };
-
-  const handleSpacebarDown = (event: KeyboardEvent) => {
-    if (event.code === 'Space') {
-      event.preventDefault();
-      startHold();
-    }
-  };
-
-  const handleSpacebarUp = (event: KeyboardEvent) => {
-    if (event.code === 'Space') {
-      event.preventDefault();
-      stopHold();
-    }
-  };
-
-
-  onMounted(() => {
-    interval = setInterval(moveMinibar, 16);
-    window.addEventListener('keydown', handleSpacebarDown);
-    window.addEventListener('keyup', handleSpacebarUp);
-
+    // Si está en modo auto, establece el intervalo para aumentar o reducir el contador
     if (props.isAuto) {
-      // Simulación de que el personaje 2 hace clic automáticamente
       intervalAutoClicks = setInterval(() => {
-        const chanceToHit = Math.random();
-        // Detectar si la minibar pasa por encima de las coloredZones
-        if (isInsideColoredZone.value) {
-          if (chanceToHit <= 0.8) {
-            handleClick(); // Hace clic dentro de la zona coloreada con 80% de probabilidad
-          }
+        if (props.isCountdownActive) {
+          if (isInsideColoredZone.value) counter.value += bonus.value;
+          else if (Math.random() <= 0.1) counter.value -= penalty.value;
+
+          emit("updateCounter", counter.value);
         }
-        else {
-          if (chanceToHit <= 0.1) {
-            handleErrorClick();
-          }  
-        }
-      }, 20);  // Intervalo de 1 segundo para hacer clic
+      }, 50);
+    } else {
+      window.addEventListener("keydown", handleKeyDown);
+      window.addEventListener("keyup", handleKeyUp);
     }
 
-  });
-  onUnmounted(() => {
-    clearInterval(intervalAutoClicks);
-    clearInterval(interval);
-    clearInterval(holdTimer);
-    window.removeEventListener('keydown', handleSpacebarDown);
-    window.removeEventListener('keyup', handleSpacebarUp);
-  });
+});
+
+
+// Limpiar los intervalos cuando el countdown termina
+onUnmounted(() => {
+  clearInterval(interval);
+  clearInterval(holdTimer);
+  clearInterval(intervalAutoClicks); 
+  window.removeEventListener("resize", updateBarWidth);
+  window.removeEventListener("keydown", handleKeyDown);
+  window.removeEventListener("keyup", handleKeyUp);
+});
 </script>

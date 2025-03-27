@@ -17,7 +17,6 @@ export async function getListCharacters() {
 
 export async function getCharacter(id: string) {
     try {
-        console.log("Obteniendo personaje con ID:", id); // Verificar que el ID sea correcto
 
         if (!id) {
             throw new Error("ID de personaje no válido.");

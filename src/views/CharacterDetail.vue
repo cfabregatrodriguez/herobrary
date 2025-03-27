@@ -24,6 +24,9 @@
               <BarStat stat="Power" icon="mdi-lightning-bolt-outline" color="purple-lighten-1" :value="character.powerstats.power" />
               <BarStat stat="Combat" icon="mdi-fencing" color="deep-orange-lighten-2" :value="character.powerstats.combat" />
             </v-card-text>
+            <BarFight 
+                :character="character" 
+            />
             <v-card-subtitle class="py-2">{{ character.biography?.['fullName'] || 'Unknown' }}</v-card-subtitle>
           </v-card>
         </v-container>
@@ -32,7 +35,6 @@
         </div>
     </v-col>
   </v-row>
-  
 
 </template>
 

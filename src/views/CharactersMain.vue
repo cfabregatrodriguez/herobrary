@@ -4,6 +4,7 @@
         v-model="searchQuery" 
         label="Search character..." 
         prepend-inner-icon="mdi-magnify"
+        density="compact"
         clearable
     ></v-text-field>
 
@@ -95,7 +96,6 @@ const isSelected = (character: any) => {
 // Cargar los datos de los personajes cuando se monta el componente
 onMounted(async () => {
   const data = await getListCharacters();
-  console.log("datos recibidos en characterMain: ", data);
   if (Array.isArray(data) && data.length > 0) {
     characters.value = data;
   } else {

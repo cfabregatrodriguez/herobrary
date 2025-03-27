@@ -20,6 +20,7 @@
     font-size: 12px;
     text-align: left;
   }
+
   &::after {
     border-color: transparent #fff transparent transparent;
     border-style: solid;
@@ -31,6 +32,14 @@
     top: auto;
     z-index: 40;
   }
+  &--chara {
+    &::after {
+      content: none;
+    }
+  .v-card-subtitle {
+    text-align: right;
+  }
+} 
   .v-btn {
     color: #fff;
   }

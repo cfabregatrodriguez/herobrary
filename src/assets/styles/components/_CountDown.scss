@@ -1,0 +1,8 @@
+@use '../abstracts/variables' as *;
+
+
+.#{$namespace}countdown {
+    p {
+        font-size: 8rem;
+    }
+}
