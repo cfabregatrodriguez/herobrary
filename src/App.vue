@@ -2,7 +2,7 @@
   <v-app>
     <div  class="pa-16">
       <router-link to="/">
-        <h1>HEROBRARY</h1>
+        <h1 class="hb-title permanent-marker-regular">HEROBRARY</h1>
       </router-link>
       <SelectedCharacters 
           :selectedCharacters="selectedCharactersStore.selectedCharacters" 

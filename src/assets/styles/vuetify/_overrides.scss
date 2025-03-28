@@ -50,3 +50,10 @@
     right: 5px;
   }
 }
+
+a {
+  color: #263238;
+  &:hover {
+    text-decoration: none;
+  }
+}

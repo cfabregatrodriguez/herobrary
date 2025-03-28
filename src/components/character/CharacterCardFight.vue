@@ -3,7 +3,6 @@
         <v-card
             :class="'v-card--chara v-card--chara' + characterNum"
             class="mx-auto"
-            :style="{ minHeight: '300px', width: '280px' }"
         >
             <v-img
             :src="character.images.md"
@@ -13,7 +12,7 @@
             />
             <v-card-title>{{ character.name }}</v-card-title>
             <div  class="ma-4">
-                <Stats 
+                <CharacterStats 
                     :character="character" 
                     density="compact"/>
             </div>
@@ -25,7 +24,7 @@
 
 
 <script setup lang="ts">
-    import Stats from "@/components/Stats.vue";
+    import CharacterStats from "@/components/character/CharacterStats.vue";
     import { Character } from '@/models/character.model';
 
     // Recibir las propiedades del componente

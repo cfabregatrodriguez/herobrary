@@ -17,14 +17,14 @@
               </v-btn>
             </div>
             <v-card-text>
-              <BarStat stat="Intelligence" icon="mdi-brain" color="orange-lighten-2" :value="character.powerstats.intelligence" />
-              <BarStat stat="Strength" icon="mdi-weight" color="red-lighten-1" :value="character.powerstats.strength" />
-              <BarStat stat="Speed" icon="mdi-run-fast" color="blue-lighten-1" :value="character.powerstats.speed" />
-              <BarStat stat="Durability" icon="mdi-wall" color="green-darken-1" :value="character.powerstats.durability" />
-              <BarStat stat="Power" icon="mdi-lightning-bolt-outline" color="purple-lighten-1" :value="character.powerstats.power" />
-              <BarStat stat="Combat" icon="mdi-fencing" color="deep-orange-lighten-2" :value="character.powerstats.combat" />
+              <CharacterBarStat stat="Intelligence" icon="mdi-brain" color="orange-lighten-2" :value="character.powerstats.intelligence" />
+              <CharacterBarStat stat="Strength" icon="mdi-weight" color="red-lighten-1" :value="character.powerstats.strength" />
+              <CharacterBarStat stat="Speed" icon="mdi-run-fast" color="blue-lighten-1" :value="character.powerstats.speed" />
+              <CharacterBarStat stat="Durability" icon="mdi-wall" color="green-darken-1" :value="character.powerstats.durability" />
+              <CharacterBarStat stat="Power" icon="mdi-lightning-bolt-outline" color="purple-lighten-1" :value="character.powerstats.power" />
+              <CharacterBarStat stat="Combat" icon="mdi-fencing" color="deep-orange-lighten-2" :value="character.powerstats.combat" />
             </v-card-text>
-            <BarFight 
+            <CharacterBarFight 
                 :character="character" 
             />
             <v-card-subtitle class="py-2">{{ character.biography?.['fullName'] || 'Unknown' }}</v-card-subtitle>
@@ -43,9 +43,9 @@ import { ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { getCharacter } from "@/services/api";
 import { useSelectedCharactersStore } from "@/stores/selectedCharactersStore";
-import BarFight from "@/components/BarFight.vue";
-import BarStat from "@/components/BarStat.vue";
-import EnergyBall from "@/components/EnergyBall.vue";
+import CharacterBarFight from "@/components/character/CharacterBarFight.vue";
+import CharacterBarStat from "@/components/character/CharacterBarStat.vue";
+import CharacterPowerBar from "@/components/character/CharacterPowerBar.vue";
 import { Character } from '@/models/character.model';
 
 
@@ -107,10 +107,12 @@ const averagePowerReal = computed(() => {
 
   // Computado para saber si el personaje está seleccionado
   const isSelected = computed(() => {
-    return selectedCharactersStore.selectedCharacters.some(
-      (selectedCharacter) => selectedCharacter.id === character.value?.id
-    );
-  });
+  if (!character.value) return false; 
+
+  return selectedCharactersStore.selectedCharacters
+    .filter(character => character !== null) // Filtrar valores nulos
+    .some((selectedCharacter) => selectedCharacter.id === character.value?.id);
+});
 
 // Obtener los datos del personaje al montar el componente
 onMounted(async () => {

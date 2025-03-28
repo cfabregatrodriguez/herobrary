@@ -14,10 +14,10 @@
         position: absolute;
         bottom: 5px;
         left: 5px;
-        width: 50px;
+        width: calc(100% - 10px);
         height: calc(100% - 10px);
-        background: linear-gradient(to bottom right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0), rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3), rgba(255, 255, 255, .5));
-        // transform: rotate(1deg);
+        background: linear-gradient(to top left, rgba(255, 255, 255, 0) 70%, rgba(255, 255, 255, 0.2) 90%, rgba(255, 255, 255, 0.8) 100%);
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
         z-index: 9999;
     }
     &:after {
@@ -25,9 +25,9 @@
         position: absolute;
         top: 5px;
         left: 5px;
-        width: 40px;
-        height: 40px;
-        background: linear-gradient(to top left, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+        width: calc(100% - 10px);
+        height: calc(100% - 10px);
+        // background: linear-gradient(to top left, rgba(255, 255, 255, 1) 10%, rgba(255, 255, 255, 0) 100%);
         /* transform: rotate(-90deg); */
         opacity: 1;
         z-index: 9999;

@@ -71,14 +71,14 @@ const direction = ref(1);
 const minibarPos = ref(0);
 
 // Refs para jugador
-const baseHoldInterval = 100;
+const baseHoldInterval = 50;
 const isHolding = ref(false);
 let interval: number;
 let holdTimer: number;
 const holdTime = ref(0);
 
 // Refs para jugador auto
-const baseHoldIntervalAuto = 100; //velocidad del intervalo del jugador en modo auto
+const baseHoldIntervalAuto = 75; //velocidad del intervalo del jugador en modo auto
 const baseChanceToHitAuto = 2; //probabilidad de acertar en modo auto, a mas valor menos probabilidad
 const isAutoClick = ref(false); //el enemigo simula un click
 let intervalAutoClicks: number;
@@ -97,11 +97,11 @@ function calculatePowerZone(power: number, maxWidth: number) {
 // Calcular CombatZones
 function calculateCombatZones(combat: number, maxWidth: number) {
   const combatZones: { width: number }[] = [];
-  if (combat <= 20) combatZones.push({ width: 0.01 * maxWidth }, { width: 0.01 * maxWidth });
-  else if (combat <= 50) combatZones.push({ width: 0.05 * maxWidth }, { width: 0.01 * maxWidth });
-  else if (combat <= 80) combatZones.push({ width: 0.05 * maxWidth }, { width: 0.01 * maxWidth }, { width: 0.05 * maxWidth });
-  else if (combat <= 99) combatZones.push({ width: 0.05 * maxWidth }, { width: 0.05 * maxWidth }, { width: 0.1 * maxWidth });
-  else if (combat === 100) combatZones.push({ width: 0.05 * maxWidth },{ width: 0.1 * maxWidth },{ width: 0.1 * maxWidth });
+  if (combat <= 20) combatZones.push({ width: 0.1 * maxWidth });
+  else if (combat <= 50) combatZones.push({ width: 0.1 * maxWidth }, { width: 0.1 * maxWidth });
+  else if (combat <= 80) combatZones.push({ width: 0.2 * maxWidth },{ width: 0.1 * maxWidth });
+  else if (combat <= 99) combatZones.push({ width: 0.2 * maxWidth },{ width: 0.2 * maxWidth });
+  else if (combat === 100) combatZones.push({ width: 0.2 * maxWidth },{ width: 0.2 * maxWidth },{ width: 0.1 * maxWidth });
   
   return combatZones;
 }
@@ -118,10 +118,18 @@ function calculateZones(power: number, combat: number, maxWidth: number) {
   // Intercalamos power y combat
   while (i < powerZone.width || i < combatZones.length) {
     if (i < combatZones.length) {
-      allZones.push(combatZones[i]);
+      allZones.push({
+        ...combatZones[i],
+        start: 0, // Default start value
+        color: '#ff8a65' // Default color for combat zones
+      });
     }
     if (i < 1) { // Solo agregar 1 zona de tipo 'power'
-      allZones.push(powerZone);
+      allZones.push({
+        ...powerZone,
+        start: 0, // Default start value
+        color: '#ab47bc' // Default color for power zones
+      });
     }
     i++;
   }
@@ -173,8 +181,17 @@ const isInCombatZone = computed(() => currentZone.value?.type === 'combat');
 
 // calcula el nuevo valor del counter según si estamos dentro de una zona coloreada y segun el color de la zona
 const updateCounterValue = () => {
-  const bonusFinal = isInCombatZone.value ? bonus.value : holdTime.value/2;
-  let newValue = 0;
+  let bonusFinal: number;
+  if (isInCombatZone.value) {
+    bonusFinal = bonus.value;
+    clearInterval(holdTimer); //ponemos este limite para que en las zonas de combate no se pueda mantener el boton apretado.
+    holdTime.value = 0;
+  }
+  else {
+    bonusFinal = holdTime.value/2;
+  }
+
+  let newValue: number;
   if (isInsideColoredZone.value) {
     newValue = props.counter + bonusFinal;
   }
@@ -207,11 +224,18 @@ const updateCounterValueAuto = () => {
   let newValue = 0;
 
   // Cálculo de la precisión basado en la anchura de la zona
-  const precision = Math.max(0.05, Math.min(0.95, Math.pow(zoneWidth / maxWidth, baseChanceToHitAuto)));
+  // const precision = Math.max(0.05, Math.min(0.95, Math.pow(zoneWidth / maxWidth, baseChanceToHitAuto)));
+  // expo = 1.5 → hace que 0.2 tenga solo un 8% y 0.4 suba al 25%.
+  // expo = 2 → hace que 0.2 tenga un 4% y 0.4 solo un 16%, pero sube bien al 64% cuando es
+  const expo = 1
+  const factor = 1.3
+  const rawPrecision = Math.pow(zoneWidth, expo);
+  const precision = Math.max(0.05, Math.min(0.95, rawPrecision * factor));
+
 
   if (isInsideColoredZone.value && randomValue <= precision) {
     newValue = props.counter + bonusFinal;
-  } else if (Math.random() <= 0.1) {
+  } else if (randomValue <= 0.1) {
     autoBonusCounter.value = 1;
     isAutoClick.value = true;
     newValue = props.counter - penalty.value;
@@ -240,17 +264,10 @@ const speed = computed(() => {
 });
 
 // Computed para el ancho de la minibarra
-//descartada al cambiar currentZone esta parte sirve para esa version descartada de currentZone
-// const minibarWidth = computed(() => {
-//   if (!props.character) return 20;
-//   return Math.max(5, Math.min(40, (130 - props.character.powerstats.intelligence) / 3));
-// });
-
-// Computed para el ancho de la minibarra
 const minibarWidth = computed(() => {
   if (!props.character) return 20;
   // A mayor inteligencia, mayor será el valor
-  return Math.max(5, Math.min(40, (props.character.powerstats.intelligence - 30) / 3));
+  return Math.max(5, (props.character.powerstats.intelligence/2 - 10));
 });
 
 // Computed para penalty
@@ -262,7 +279,7 @@ const penalty = computed(() => {
 // Computed para bonus
 const bonus = computed(() => {
   if (!props.character) return 1;
-  return 1 + props.character.powerstats.strength/5;
+  return 1 + props.character.powerstats.strength/2;
 });
 
 // === Funciones de actualización ===
@@ -295,7 +312,6 @@ const moveMinibar = () => {
 const updateHold = () => {
   if (!props.isCountdownActive) return;  // No actualizar el contador si el countdown no está activo
   if (!isHolding.value) return;
-  console.log(holdTime.value)
 
   if (isInsideColoredZone.value) {
     holdTime.value++;

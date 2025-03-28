@@ -20,7 +20,7 @@
 
     <v-row>
       <v-col v-for="character in paginatedCharacters" :key="character.id" cols="6" sm="4" md="2" class="pa-1">
-        <CharacterCard
+        <CharacterList
           :character="character"
           :isSelected="isSelected(character)"
           :toggleSelection="toggleSelection"
@@ -45,7 +45,7 @@ import { ref, computed, onMounted, watch  } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useSelectedCharactersStore } from "@/stores/selectedCharactersStore";
 import { getListCharacters } from "@/services/api";
-import CharacterCard from "@/components/CharacterCard.vue";
+import CharacterList from "@/components/CharacterList.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -54,7 +54,7 @@ const router = useRouter();
 const characters = ref<any[]>([]);
 const page = ref(Number(route.query.page) || 1);
 const itemsPerPage = 24; // Número de elementos por página
-const searchQuery = ref(""); // Estado para la búsqueda
+const searchQuery = ref(route.query.search ? String(route.query.search) : ""); 
 
 // Acceder a la store de Pinia
 const selectedCharactersStore = useSelectedCharactersStore();
@@ -99,6 +99,10 @@ const isSelected = (character: any) => {
 
 watch(page, (newPage) => {
     router.replace({ query: { ...route.query, page: newPage } });
+});
+
+watch(searchQuery, (newSearch) => {
+    router.replace({ query: { ...route.query, search: newSearch, page: 1 } }); // opcional: vuelve a la página 1 si buscas
 });
 
 // Cargar los datos de los personajes cuando se monta el componente

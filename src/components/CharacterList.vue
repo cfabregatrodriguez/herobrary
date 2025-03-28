@@ -6,7 +6,7 @@
     }"
     class="mx-auto"
     :style="{ minHeight: '300px', width: '100%' }"
-    @click="goToCharacterDetail"
+    @click="goToDetail"
   >
     <v-badge v-if="isSelected"
         class="hb-card__badge"
@@ -48,7 +48,7 @@ const selectedCharactersStore = useSelectedCharactersStore();
 // Computado para saber si el personaje está seleccionado
 const isSelected = computed(() =>
   selectedCharactersStore.selectedCharacters.some(
-    (selectedCharacter) => selectedCharacter.id === props.character.id
+    (selectedCharacter) => selectedCharacter && selectedCharacter.id === props.character.id
   )
 );
 
@@ -63,11 +63,11 @@ const toggleSelection = (character: Character) => {
 
 // Función para navegar al detalle del personaje
 const router = useRouter();
-const goToCharacterDetail = () => {
+const goToDetail = () => {
   if (!props.character.id) return;
 
   router.push({
-    name: 'CharacterDetail',
+    name: 'Detail',
     params: { id: props.character.id.toString() },
   });
 };
