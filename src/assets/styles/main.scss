@@ -6,9 +6,9 @@
 @use "./components/BarStat" as *;
 @use "./components/BarFight" as *;
 @use "./components/CharacterPowerBar" as *;
-@use "./components/CharacterCardFight" as *;
 @use "./components/Countdown" as *;
 @use "./components/SelectedCharacters" as *;
+@use "./components/Character" as *;
 
 // Estilos globales adicionales
 body {

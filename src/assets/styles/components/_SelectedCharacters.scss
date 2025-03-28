@@ -1,23 +1,25 @@
 @use '../abstracts/variables' as *;
 
 .#{$namespace}avatar-container {
-  position: relative;
-  transition: all 0.3s ease; // Para animar el oscurecimiento
-  cursor: pointer;
-}
-
-.#{$namespace}avatar-container:hover {
-  filter: brightness(70%); // Oscurecer al hacer hover
+    position: relative;
+    transition: all 0.3s ease; // Para animar el oscurecimiento
+    cursor: pointer;
 }
 
 .#{$namespace}remove-icon {
-  position: absolute;
-  margin: auto;
-  color: white;
-  font-size: 24px;
-  display: none;
+    position: absolute;
+    margin: auto;
+    color: white;
+    font-size: 24px;
+    display: none;
 }
 
 .#{$namespace}avatar-container:hover .hb-remove-icon {
-  display: block; // Mostrar la X al hacer hover
+    display: block; // Mostrar la X al hacer hover
+    background-color: rgba(0, 0, 0, 0.5);
+    height: 100%;
+    width: 100%;
+    margin: auto;
+    display: flex;
+    filter: brightness(70%); // Oscurecer al hacer hover
 }

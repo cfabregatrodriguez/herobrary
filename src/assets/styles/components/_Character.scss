@@ -1,0 +1,29 @@
+/* Animación para el personaje de la izquierda */
+.slide-left-enter-active {
+    animation: slideLeft 0.8s ease-out;
+}
+@keyframes slideLeft {
+    from {
+        transform: translateX(-100vw);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Animación para el personaje de la derecha */
+.slide-right-enter-active {
+    animation: slideRight 0.8s ease-out;
+}
+@keyframes slideRight {
+    from {
+        transform: translateX(100vw);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}

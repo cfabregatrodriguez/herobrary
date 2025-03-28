@@ -1,43 +1,37 @@
 <template>
   <v-app>
-    <div  class="pa-16">
+
+    <v-app-bar app fixed>
+      <SelectedCharacters :selectedCharacters="selectedCharactersStore.selectedCharacters"
+        :toggleSelection="toggleSelection" />
+    </v-app-bar>
+
+    <v-main>
       <router-link to="/">
         <h1 class="hb-title permanent-marker-regular">HEROBRARY</h1>
       </router-link>
-      <SelectedCharacters 
-          :selectedCharacters="selectedCharactersStore.selectedCharacters" 
-          :toggleSelection="toggleSelection" 
-      />
-      <router-view></router-view>
-    </div>
+      <div class="px-16 pb-16 pt-16">
+          <router-view></router-view>
+      </div>
+    </v-main>
+
   </v-app>
 </template>
 
-<script lang="ts">
-  import { defineComponent } from "vue";
-  import { useSelectedCharactersStore } from "@/stores/selectedCharactersStore";
-  import SelectedCharacters from "@/components/SelectedCharacters.vue";
-  export default defineComponent({
-    name: "App",
-    components: {
-      SelectedCharacters
-    },
-    setup() {
-      const selectedCharactersStore = useSelectedCharactersStore();
-      // La función toggleSelection se puede pasar como prop al componente SelectedCharacters
-      const toggleSelection = (character: any) => {
-        const isSelected = selectedCharactersStore.isCharacterSelected(character);
-        if (isSelected) {
-          selectedCharactersStore.removeCharacter(character);
-        } else {
-          selectedCharactersStore.addCharacter(character);
-        }
-      };
+<script setup lang="ts">
+import { useSelectedCharactersStore } from "@/stores/selectedCharactersStore";
+import SelectedCharacters from "@/components/SelectedCharacters.vue";
 
-      return {
-        selectedCharactersStore,
-        toggleSelection
-      };
-    }
-  });
+// Acceso a la store
+const selectedCharactersStore = useSelectedCharactersStore();
+
+// Función para alternar la selección de personajes
+const toggleSelection = (character: any) => {
+  const isSelected = selectedCharactersStore.isCharacterSelected(character);
+  if (isSelected) {
+    selectedCharactersStore.removeCharacter(character);
+  } else {
+    selectedCharactersStore.addCharacter(character);
+  }
+};
 </script>

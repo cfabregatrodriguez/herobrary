@@ -1,17 +1,20 @@
 <template>
     <div>
-        <v-row v-if="character && character2" >
+        <v-row>
             <v-col cols="5" class="pt-0 pr-0">
-                <Character
-                    :character="character" 
-                    :counter="counter" 
-                    :flash="flash1" 
-                    :isCountdownActive="isCountdownActive" 
-                    :bgColor="bgColor"
-                    @handleDivisionPassed="handleDivisionPassed" 
-                    @handleCounterChange="handleCounterChange" 
-                    @handleFilled="handleFilled" 
-                />
+                <transition name="slide-left" >
+                    <Character 
+                        v-if="character"
+                        :character="character" 
+                        :counter="counter" 
+                        :flash="flash1" 
+                        :isCountdownActive="isCountdownActive" 
+                        :bgColor="bgColor"
+                        @handleDivisionPassed="handleDivisionPassed" 
+                        @handleCounterChange="handleCounterChange" 
+                        @handleFilled="handleFilled" 
+                    />
+                </transition>
             </v-col>
             <v-col cols="2" class="d-sm-flex align-center justify-center">
                 <div>
@@ -26,21 +29,25 @@
                 </div>
             </v-col>
             <v-col cols="5" class="pt-0 pl-0">
-                <Character
-                    :character="character2" 
-                    :counter="counter2" 
-                    :flash="flash2" 
-                    :isCountdownActive="isCountdownActive" 
-                    :bgColor="bgColor2"
-                    :isAuto="true"
-                    @handleDivisionPassed="handleDivisionPassed2" 
-                    @handleCounterChange="handleCounterChange2" 
-                    @handleFilled="handleFilled2"  
-                />
+                <transition name="slide-right">
+                    <Character
+                        v-if="character2"
+                        :character="character2" 
+                        :counter="counter2" 
+                        :flash="flash2" 
+                        :isCountdownActive="isCountdownActive" 
+                        :bgColor="bgColor2"
+                        :isAuto="true"
+                        @handleDivisionPassed="handleDivisionPassed2" 
+                        @handleCounterChange="handleCounterChange2" 
+                        @handleFilled="handleFilled2"  
+                    />
+                </transition>
             </v-col>
         </v-row>
     </div>
 </template>
+
 
 <script setup lang="ts">
 // Vue & Utilities

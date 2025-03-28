@@ -48,6 +48,11 @@ export const useSelectedCharactersStore = defineStore('selectedCharacters', {
       this.selectedCharacters = [];
       localStorage.removeItem('selectedCharacters');
     },
+
+    setCharacter(index: number, character: Character) {
+      this.selectedCharacters[index] = character;
+      localStorage.setItem('selectedCharacters', JSON.stringify(this.selectedCharacters));
+    }
   },
 
   getters: {
