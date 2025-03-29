@@ -1,49 +1,42 @@
 <template>
-  <div class="hb-barfight d-flex flex-column align-center" v-if="character">
-    <v-progress-linear 
-      ref="progressBarRef"
-      class="position-relative"
-      style="width: 100%; height: 20px;"
-      color="grey lighten-1"
-    >
-      <!-- Zonas de color -->
-      <template v-for="(zone, index) in coloredZones" :key="index">
-        <div class="position-absolute"
-          :style="{
+  <div>
+    <div class="hb-barfight d-flex flex-column align-center" v-if="character">
+      <v-progress-linear ref="progressBarRef" class="position-relative" style="width: 100%; height: 20px;"
+        color="grey lighten-1">
+        <!-- Zonas de color -->
+        <template v-for="(zone, index) in coloredZones" :key="index">
+          <div class="position-absolute" :style="{
             left: zone.start + 'px',
             width: zone.width + 'px',
             height: '30px',
             backgroundColor: zone.color
           }">
-        </div>
-      </template>
+          </div>
+        </template>
 
-      <!-- Minibar -->
-      <div 
-        class="hb-barfight__minibar position-absolute"
-        :style="{
+        <!-- Minibar -->
+        <div class="hb-barfight__minibar position-absolute" :style="{
           left: minibarPos + 'px',
           width: minibarWidth + 'px',
           height: '100%',
-          opacity: isHolding || isAutoClick ? 0.5 : 1
-        }"
-      ></div>
-    </v-progress-linear>
+        }" :class="(isHolding || isAutoClick) && isCountdownActive ? 'hb-barfight__minibar--hit' : ''"></div>
+      </v-progress-linear>
 
-    <!-- Información -->
-  <v-row>
-    <v-col>Contador: {{ Math.round(counter * 10) / 10 }}</v-col>
-    <v-col>Bonus: {{ Math.round(bonus * 10) / 10 }}</v-col>
-    <v-col>Penalty: {{ Math.round(penalty * 100) / 100 }}</v-col>
-    <v-col>Speed: {{ Math.round(speed * 10) / 10 }}</v-col>
-    <v-col>Nº zones: {{ coloredZones.length }}</v-col>
-    <v-col>Width zones: {{ Math.round(coloredZones[0]?.width * 10) / 10 }}</v-col>
-    <v-col>Bar width: {{ Math.round(minibarWidth * 10) / 10 }}</v-col>
-  </v-row>
-  </div>
+      <!-- Información -->
+      <v-row>
+        <v-col>Contador: {{ Math.round(counter * 10) / 10 }}</v-col>
+        <v-col>Bonus: {{ Math.round(bonus * 10) / 10 }}</v-col>
+        <v-col>Penalty: {{ Math.round(penalty * 100) / 100 }}</v-col>
+        <v-col>Speed: {{ Math.round(speed * 10) / 10 }}</v-col>
+        <v-col>Nº zones: {{ coloredZones.length }}</v-col>
+        <v-col>Width zones: {{ Math.round(coloredZones[0]?.width * 10) / 10 }}</v-col>
+        <v-col>Bar width: {{ Math.round(minibarWidth * 10) / 10 }}</v-col>
+      </v-row>
+    </div>
 
-  <div v-else>
-    <p>Character not available, loading...</p>
+    <div v-else>
+      <p>Character not available, loading...</p>
+    </div>
   </div>
 </template>
 
@@ -65,7 +58,7 @@ const emit = defineEmits<{
 
 // Refs comunes
 const barWidth = ref(0);
-const maxTotalWidth = ref(0); 
+const maxTotalWidth = ref(0);
 const progressBarRef = ref<HTMLElement | null>(null);
 const direction = ref(1);
 const minibarPos = ref(0);
@@ -79,7 +72,7 @@ const holdTime = ref(0);
 
 // Refs para jugador auto
 const baseHoldIntervalAuto = 75; //velocidad del intervalo del jugador en modo auto
-const baseChanceToHitAuto = 2; //probabilidad de acertar en modo auto, a mas valor menos probabilidad
+const baseChanceToHitAuto = 1; //probabilidad de acertar en modo auto, a mas valor menos probabilidad
 const isAutoClick = ref(false); //el enemigo simula un click
 let intervalAutoClicks: number;
 const autoBonusCounter = ref(1);
@@ -99,10 +92,11 @@ function calculateCombatZones(combat: number, maxWidth: number) {
   const combatZones: { width: number }[] = [];
   if (combat <= 20) combatZones.push({ width: 0.1 * maxWidth });
   else if (combat <= 50) combatZones.push({ width: 0.1 * maxWidth }, { width: 0.1 * maxWidth });
-  else if (combat <= 80) combatZones.push({ width: 0.2 * maxWidth },{ width: 0.1 * maxWidth });
-  else if (combat <= 99) combatZones.push({ width: 0.2 * maxWidth },{ width: 0.2 * maxWidth });
-  else if (combat === 100) combatZones.push({ width: 0.2 * maxWidth },{ width: 0.2 * maxWidth },{ width: 0.1 * maxWidth });
-  
+  else if (combat <= 80) combatZones.push({ width: 0.2 * maxWidth });
+  else if (combat <= 90) combatZones.push({ width: 0.2 * maxWidth }, { width: 0.15 * maxWidth });
+  else if (combat <= 99) combatZones.push({ width: 0.25 * maxWidth }, { width: 0.15 * maxWidth });
+  else if (combat === 100) combatZones.push({ width: 0.25 * maxWidth }, { width: 0.25 * maxWidth });
+
   return combatZones;
 }
 
@@ -114,7 +108,7 @@ function calculateZones(power: number, combat: number, maxWidth: number) {
   // Intercalar las zonas
   const allZones: { width: number, type: string, start: number, color: string }[] = [];
   let i = 0;
-  
+
   // Intercalamos power y combat
   while (i < powerZone.width || i < combatZones.length) {
     if (i < combatZones.length) {
@@ -142,8 +136,8 @@ function calculateZones(power: number, combat: number, maxWidth: number) {
   // Calcular las posiciones de inicio y asignar colores
   let currentPosition = spaceSize;
   return allZones.map(zone => {
-    const z = { 
-      start: currentPosition, 
+    const z = {
+      start: currentPosition,
       width: zone.width,
       type: zone.type,
       color: zone.type === 'power' ? '#ab47bc' : '#ff8a65'
@@ -188,7 +182,7 @@ const updateCounterValue = () => {
     holdTime.value = 0;
   }
   else {
-    bonusFinal = holdTime.value/2;
+    bonusFinal = holdTime.value / 2;
   }
 
   let newValue: number;
@@ -209,7 +203,6 @@ const updateCounterValueAuto = () => {
   // Asegúrate de que currentZone y maxWidth estén correctamente definidas
 
   const zoneWidth = currentZone.value ? currentZone.value.width : 0;  // Anchura de la zona coloreada
-  const maxWidth = 100; // O el valor máximo adecuado para el ancho total de la barra
   const randomValue = Math.random();
 
   if (randomValue <= 0.95) {
@@ -220,16 +213,14 @@ const updateCounterValueAuto = () => {
     isAutoClick.value = false;
   }
 
-  const bonusFinal = isInCombatZone.value ? bonus.value/2 : autoBonusCounter.value;
+  const bonusFinal = isInCombatZone.value ? bonus.value / 2 : autoBonusCounter.value;
   let newValue = 0;
 
   // Cálculo de la precisión basado en la anchura de la zona
-  // const precision = Math.max(0.05, Math.min(0.95, Math.pow(zoneWidth / maxWidth, baseChanceToHitAuto)));
-  // expo = 1.5 → hace que 0.2 tenga solo un 8% y 0.4 suba al 25%.
-  // expo = 2 → hace que 0.2 tenga un 4% y 0.4 solo un 16%, pero sube bien al 64% cuando es
-  const expo = 1
+  // baseChanceToHitAuto = 1.5 → hace que 0.2 tenga solo un 8% y 0.4 suba al 25%.
+  // baseChanceToHitAuto = 2 → hace que 0.2 tenga un 4% y 0.4 solo un 16%, pero sube bien al 64% cuando es
   const factor = 1.3
-  const rawPrecision = Math.pow(zoneWidth, expo);
+  const rawPrecision = Math.pow(zoneWidth, baseChanceToHitAuto);
   const precision = Math.max(0.05, Math.min(0.95, rawPrecision * factor));
 
 
@@ -267,19 +258,19 @@ const speed = computed(() => {
 const minibarWidth = computed(() => {
   if (!props.character) return 20;
   // A mayor inteligencia, mayor será el valor
-  return Math.max(5, (props.character.powerstats.intelligence/2 - 10));
+  return Math.max(5, (props.character.powerstats.intelligence / 2 - 10));
 });
 
 // Computed para penalty
 const penalty = computed(() => {
   if (!props.character) return 4;
-  return (props.counter * ((15 - props.character.powerstats.durability/10))/100);
+  return (props.counter * ((15 - props.character.powerstats.durability / 10)) / 100);
 });
 
 // Computed para bonus
 const bonus = computed(() => {
   if (!props.character) return 1;
-  return 1 + props.character.powerstats.strength/2;
+  return 1 + props.character.powerstats.strength / 2;
 });
 
 // === Funciones de actualización ===
@@ -296,7 +287,7 @@ const updateBarWidth = () => {
 // Update Width
 const updateWidth = () => {
   if (progressBarRef.value) {
-    maxTotalWidth.value = progressBarRef.value.$el.offsetWidth || 1; 
+    maxTotalWidth.value = progressBarRef.value.$el.offsetWidth || 1;
   }
 };
 
@@ -364,17 +355,17 @@ onMounted(() => {
 
   interval = setInterval(moveMinibar, 12);
 
-    // Si está en modo auto, establece el intervalo para aumentar o reducir el contador
-    if (props.isAuto) {
-      intervalAutoClicks = setInterval(() => {
-        if (props.isCountdownActive) {
-          updateCounterValueAuto(); 
-        }
-      }, baseHoldIntervalAuto);
-    } else {
-      window.addEventListener("keydown", handleKeyDown);
-      window.addEventListener("keyup", handleKeyUp);
-    }
+  // Si está en modo auto, establece el intervalo para aumentar o reducir el contador
+  if (props.isAuto) {
+    intervalAutoClicks = setInterval(() => {
+      if (props.isCountdownActive) {
+        updateCounterValueAuto();
+      }
+    }, baseHoldIntervalAuto);
+  } else {
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+  }
 
 });
 
@@ -383,7 +374,7 @@ onMounted(() => {
 onUnmounted(() => {
   clearInterval(interval);
   clearInterval(holdTimer);
-  clearInterval(intervalAutoClicks); 
+  clearInterval(intervalAutoClicks);
   window.removeEventListener("resize", updateBarWidth);
   window.removeEventListener("keydown", handleKeyDown);
   window.removeEventListener("keyup", handleKeyUp);

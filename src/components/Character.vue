@@ -1,60 +1,62 @@
 <template>
-    <div 
-        class="d-sm-flex"  
-        :style="isAuto ? { flexDirection: 'row-reverse' } : { flexDirection: 'row' }">
-            <CharacterCardFight :character="character" characterNum="1" />
-            <CharacterPowerBar 
-                :character="character" 
-                @divisionPassed="handleDivisionPassed" 
-                :counter="counter" 
-                :bgColor="bgColor" 
-                :flash="flash" 
-                @updateCounter="handleCounterChange" 
-                @filled="handleFilled" 
-            />
+    <div>
+        <div class="d-sm-flex" :style="isAuto ? { flexDirection: 'row-reverse' } : { flexDirection: 'row' }">
+            <CharacterCardFight :character="character" :characterNum="1" />
+            <CharacterPowerBar :character="character" @divisionPassed="handleDivisionPassed" :counter="counter"
+                :bgColor="bgColor" @updateCounter="handleCounterChange" @filled="handleFilled" />
+        </div>
+        <CharacterBarFight :character="character" :counter="counter" :bgColor="bgColor"
+            :isCountdownActive="countdownStore.isCountdownActive" :isAuto="isAuto"
+            @updateCounter="handleCounterChange" />
     </div>
-    <CharacterBarFight 
-        :character="character" 
-        :counter="counter" 
-        :bgColor="bgColor"
-        :isCountdownActive="isCountdownActive" 
-        :isAuto="isAuto"
-        @updateCounter="handleCounterChange" 
-    />
 </template>
 
 <script setup lang="ts">
-    import { ref } from 'vue';
-    import CharacterCardFight from '@/components/character/CharacterCardFight.vue';
-    import CharacterPowerBar from '@/components/character/CharacterPowerBar.vue';
-    import CharacterBarFight from '@/components/character/CharacterBarFight.vue';
+import { CharacterModel } from '@/models/character.model';
+import CharacterCardFight from '@/components/character/CharacterCardFight.vue';
+import CharacterPowerBar from '@/components/character/CharacterPowerBar.vue';
+import CharacterBarFight from '@/components/character/CharacterBarFight.vue';
 
-    const props = defineProps({
-        character: Object,
-        counter: Number,
-        flash: Boolean,
-        isAuto: Boolean,
-        bgColor: String,
-        isCountdownActive: Boolean,
-    });
+// Pinia Stores
+import { useCountdownStore } from '@/stores/countdownStore';
+const countdownStore = useCountdownStore();  // Usamos la store de countdown
 
-    const flash = ref(false);
+const props = defineProps({
+    character: {
+        type: Object as () => CharacterModel,
+        required: true,
+        default: () => ({} as CharacterModel), // Provide a default value with type assertion
+    },
+    counter: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    isAuto: {
+        type: Boolean,
+        default: false
+    },
+    bgColor: {
+        type: String,
+        default: "#FFFFFF"
+    }
+});
 
-    const emit = defineEmits<{
-        (event: "handleDivisionPassed", value: number): void;
-        (event: "handleCounterChange", value: number): void;
-        (event: "handleFilled", value: number): void;
-    }>();
+const emit = defineEmits<{
+    (event: "divisionPassed", value: number): void;
+    (event: "counterChange", value: number): void;
+    (event: "filled", value: number): void;
+}>();
 
-    const handleFilled = () => {
-        emit('handleFilled', 0); // Replace 0 with the appropriate number value if needed
-    };
+const handleFilled = () => {
+    emit('filled', 0);
+};
 
-    const handleDivisionPassed = (division: number) => {
-        emit('handleDivisionPassed', division);
-    };
+const handleDivisionPassed = (division: number) => {
+    emit('divisionPassed', division);
+};
 
-    const handleCounterChange = (counter: number) => {
-        emit('handleCounterChange', counter);
-    };
+const handleCounterChange = (counter: number) => {
+    emit('counterChange', counter);
+};
 </script>

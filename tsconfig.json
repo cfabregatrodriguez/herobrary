@@ -1,7 +1,19 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+	"compilerOptions": {
+		"target": "esnext", // o es6, según lo que necesites
+		"module": "esnext", // o commonjs, dependiendo de tu bundler
+		"moduleResolution": "node",
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"baseUrl": "./", // Para permitir el uso de alias
+		"paths": {
+			"@/*": ["src/*"] // Esto indica que cualquier importación que use @/ se resolverá en src/
+		},
+		"resolveJsonModule": true,
+		"isolatedModules": true
+	},
+	"include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+	"exclude": ["node_modules"]
 }

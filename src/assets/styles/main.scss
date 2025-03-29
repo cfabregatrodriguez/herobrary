@@ -3,8 +3,8 @@
 @use "./layout/grid" as *;
 @use "./vuetify/overrides" as *;
 
-@use "./components/BarStat" as *;
-@use "./components/BarFight" as *;
+@use "./components/CharacterBarStat" as *;
+@use "./components/CharacterBarFight" as *;
 @use "./components/CharacterPowerBar" as *;
 @use "./components/Countdown" as *;
 @use "./components/SelectedCharacters" as *;

@@ -6,6 +6,7 @@
         prepend-inner-icon="mdi-magnify"
         density="compact"
         clearable
+        @click:clear="clearSearch"
     ></v-text-field>
 
     <v-pagination
@@ -104,6 +105,24 @@ watch(page, (newPage) => {
 watch(searchQuery, (newSearch) => {
     router.replace({ query: { ...route.query, search: newSearch, page: 1 } }); // opcional: vuelve a la página 1 si buscas
 });
+
+// Función para limpiar la búsqueda y resetear la paginación
+const clearSearch = () => {
+  searchQuery.value = "";
+  page.value = 1;
+  router.replace({ query: { page: 1 } });
+};
+
+// Watch para actualizar la URL al escribir en el buscador
+watch(searchQuery, (newSearch) => {
+  if (!newSearch.trim()) {
+    clearSearch(); // Llamamos a la función para resetear búsqueda y página
+  } else {
+    router.replace({ query: { ...route.query, search: newSearch, page: 1 } });
+    page.value = 1; // Siempre volver a la primera página
+  }
+});
+
 
 // Cargar los datos de los personajes cuando se monta el componente
 onMounted(async () => {

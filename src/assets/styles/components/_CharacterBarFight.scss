@@ -1,0 +1,25 @@
+@use "../abstracts/variables" as *;
+
+.#{$namespace}barfight {
+	.v-progress-linear {
+		height: 50px !important;
+		background-color: #263238;
+		max-width: 100%;
+		&__background {
+			border: 10px solid #263238;
+		}
+	}
+	&__minibar {
+		background-color: #b0bec5;
+		border-right: 2px solid #263238;
+		border-left: 2px solid #263238;
+		border-top: 8px solid #455a64;
+		border-bottom: 8px solid #455a64;
+		z-index: 999;
+		&--hit {
+			box-shadow: 0 0 10px rgba(255, 255, 255, 0.5),
+				0 0 20px rgba(255, 255, 255, 0.3);
+			filter: brightness(2);
+		}
+	}
+}
