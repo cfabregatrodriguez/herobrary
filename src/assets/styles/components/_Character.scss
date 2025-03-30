@@ -1,29 +1,80 @@
-/* Animación para el personaje de la izquierda */
-.slide-left-enter-active {
-    animation: slideLeft 0.8s ease-out;
-}
-@keyframes slideLeft {
-    from {
-        transform: translateX(-100vw);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+@use "../abstracts/variables" as *;
+
+.#{$namespace}character {
+	border-radius: 12px;
+	overflow: hidden;
+	position: relative;
+	box-shadow: 0 0px 20px rgba(0, 0, 0, 0.5);
+	&--0 {
+		animation: slideLeft 0.5s cubic-bezier(0.5, -0.2, 0.3, 1.2); /* Rebote más sutil */
+		&:after {
+			background: linear-gradient(
+				to top left,
+				rgba(255, 255, 255, 0) 70%,
+				rgba(255, 255, 255, 0.6) 90%,
+				rgba(255, 255, 255, 1) 100%
+			);
+		}
+	}
+	&--1 {
+		animation: slideRight 0.5s cubic-bezier(0.5, -0.2, 0.3, 1.2); /* Rebote más sutil */
+		&:after {
+			background: linear-gradient(
+				to top right,
+				rgba(255, 255, 255, 0) 70%,
+				rgba(255, 255, 255, 0.6) 90%,
+				rgba(255, 255, 255, 1) 100%
+			);
+		}
+	}
+	&--compact {
+		box-shadow: none;
+		border-radius: 0;
+		.#{$namespace}card {
+			&::after {
+				border-color: transparent #fff transparent transparent;
+				border-style: solid;
+				border-width: 12px 12px 0 0;
+				bottom: 0;
+				content: "";
+				position: absolute;
+				right: 0;
+				top: auto;
+				z-index: 40;
+			}
+		}
+	}
+	&:after {
+		pointer-events: none;
+		content: "";
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+		z-index: 9;
+	}
 }
 
-/* Animación para el personaje de la derecha */
-.slide-right-enter-active {
-    animation: slideRight 0.8s ease-out;
+@keyframes slideLeft {
+	from {
+		transform: translateX(-100vw);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(0);
+		opacity: 1;
+	}
 }
+
 @keyframes slideRight {
-    from {
-        transform: translateX(100vw);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+	from {
+		transform: translateX(100vw);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(0);
+		opacity: 1;
+	}
 }

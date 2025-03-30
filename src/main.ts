@@ -1,17 +1,14 @@
-import { createApp } from 'vue';
-import App from './App.vue';
-import router from './router';
-import vuetify from './plugins/vuetify.ts';
+import { createApp } from "vue";
+import App from "./App.vue";
+import router from "./router";
+import vuetify from "@/plugins/vuetify.ts";
 import "@/assets/styles/main.scss";
-import { createPinia } from 'pinia';  // Importar Pinia
+import { createPinia } from "pinia";
 
-
-// Crea la aplicación Vue
 const app = createApp(App);
 
-// Usa Vue Router y Vuetify en la aplicación
-app.use(router);  // Asegúrate de usar el router
+app.use(router);
 app.use(vuetify);
-app.use(createPinia()); 
+app.use(createPinia());
 
-app.mount('#app');
+app.mount("#app");

@@ -1,21 +1,26 @@
-// stores/countdownStore.ts
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
-export const useCountdownStore = defineStore("countdown", () => {
-	const isCountdownActive = ref(false);
+export const useCountdownStore = defineStore("countdown", {
+	// **State**: Define el estado de la tienda
+	state: () => ({
+		isCountdownActive: ref(false),
+	}),
 
-	const startCountdown = () => {
-		isCountdownActive.value = true;
-	};
+	getters: {
+		countdownStatus(state) {
+			return state.isCountdownActive ? "Active" : "Inactive";
+		},
+	},
 
-	const stopCountdown = () => {
-		isCountdownActive.value = false;
-	};
+	// **Actions**: Métodos que alteran el estado
+	actions: {
+		startCountdown() {
+			this.isCountdownActive = true;
+		},
 
-	return {
-		isCountdownActive,
-		startCountdown,
-		stopCountdown,
-	};
+		stopCountdown() {
+			this.isCountdownActive = false;
+		},
+	},
 });

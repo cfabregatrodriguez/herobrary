@@ -16,12 +16,15 @@
 </template>
 
 <script setup lang="ts">
+// Components
 import CharacterBarStat from "@/components/character/CharacterBarStat.vue";
+
+// Models
 import { CharacterModel } from '@/models/character.model';
 
-// Recibir las propiedades del componente
+// Props
 const props = defineProps<{
     character: CharacterModel;
-    density: String;
+    density: string;
 }>();
 </script>

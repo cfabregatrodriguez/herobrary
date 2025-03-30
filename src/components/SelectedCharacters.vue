@@ -1,96 +1,100 @@
 <template>
   <div>
+    <!-- Character selection (Slot 1) -->
     <div v-if="selectedCharacters.length > 0 || 4" class="w-100 justify-center">
-      <v-btn v-if="router.currentRoute.value.name !== 'Fight'" size="x-small"
-        @click="assignRandomCharacter(0)">RND</v-btn>
+      <v-btn :disabled="countdownStore.isCountdownActive" size="x-small" @click="assignRandomCharacter(0)">RND</v-btn>
+
+      <!-- Tooltip for selected character (Slot 1) -->
       <v-tooltip v-if="selectedCharacters[0]" location="top">
         <template v-slot:activator="{ props }">
           <v-avatar size="50" @click="toggleSelection(selectedCharacters[0])" v-bind="props"
             class="hb-avatar-container">
             <v-img :src="selectedCharacters[0].images.md" alt="Character Image" />
-            <v-icon v-if="selectedCharacters[0] && router.currentRoute.value.name !== 'Fight'"
+            <v-icon v-if="!countdownStore.isCountdownActive && router.currentRoute.value.name !== 'Fight'"
               class="hb-remove-icon mdi mdi-close" @click.stop="toggleSelection(selectedCharacters[0])" />
           </v-avatar>
         </template>
         <span>{{ selectedCharacters[0] ? selectedCharacters[0].name : 'Empty Slot' }}</span>
       </v-tooltip>
+
+      <!-- Avatar for empty slot if no character is selected (Slot 1) -->
       <v-avatar v-else color="#B0BEC5" size="50"></v-avatar>
 
-      <!-- Botón de pelea -->
-      <v-btn class="permanent-marker-regular mx-4" @click="goToCharactersFight"
-        :disabled="!canFight || router.currentRoute.value.name === 'Fight'">
-        fight
+      <!-- Fight button (only enabled if countdown is inactive and characters are selected) -->
+      <v-btn variant="outlined" class="mx-4" @click="goToCharactersFight"
+        :disabled="countdownStore.isCountdownActive || !canFight">
+        Start
       </v-btn>
+
+      <!-- Tooltip for selected character (Slot 2) -->
       <v-tooltip v-if="selectedCharacters[1]" location="top">
         <template v-slot:activator="{ props }">
           <v-avatar size="50" @click="toggleSelection(selectedCharacters[1])" v-bind="props"
             class="hb-avatar-container">
             <v-img :src="selectedCharacters[1].images.md" alt="Character Image" />
-            <v-icon v-if="selectedCharacters[1] && router.currentRoute.value.name !== 'Fight'"
+            <v-icon v-if="!countdownStore.isCountdownActive && router.currentRoute.value.name !== 'Fight'"
               class="hb-remove-icon mdi mdi-close" @click.stop="toggleSelection(selectedCharacters[1])" />
           </v-avatar>
         </template>
         <span>{{ selectedCharacters[1] ? selectedCharacters[1].name : 'Empty Slot' }}</span>
       </v-tooltip>
+
+      <!-- Avatar for empty slot if no character is selected (Slot 2) -->
       <v-avatar v-else color="#B0BEC5" size="50"></v-avatar>
 
-      <v-btn v-if="router.currentRoute.value.name !== 'Fight'" size="x-small"
-        @click="assignRandomCharacter(1)">RND</v-btn>
+      <v-btn :disabled="countdownStore.isCountdownActive" size="x-small" @click="assignRandomCharacter(1)">RND</v-btn>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+// Vue & Utilities
 import { useRouter } from 'vue-router';
 import { computed, ref, onMounted } from 'vue';
-import { useSelectedCharactersStore } from "@/stores/selectedCharactersStore";
-import { getListCharacters } from "@/services/api"; // Importa la API
+import { getListCharacters } from "@/services/api"; // Import API
 import { CharacterModel } from '@/models/character.model';
 
-// Accede a la store de Pinia
+// Pinia Stores
+import { useCountdownStore } from '@/stores/countdownStore';
+const countdownStore = useCountdownStore();  // Using countdown store
+import { useSelectedCharactersStore } from "@/stores/selectedCharactersStore";
 const selectedCharactersStore = useSelectedCharactersStore();
-const router = useRouter();
 
-// Computado para obtener los personajes seleccionados
+// Computed
 const selectedCharacters = computed(() => selectedCharactersStore.selectedCharacters);
+const canFight = computed(() => {
+  return selectedCharacters.value.length === 2 && selectedCharacters.value.every((character: CharacterModel | null) => character !== null);
+});
 
-// Lista de personajes obtenidos de la API
+
 const allCharacters = ref<CharacterModel[]>([]);
 
-// Cargar la lista de personajes al montar el componente
 onMounted(async () => {
   allCharacters.value = await getListCharacters();
 });
 
-// Computado para verificar si hay dos personajes no nulos
-const canFight = computed(() => {
-  return selectedCharacters.value.length === 2 && selectedCharacters.value.every(character => character !== null);
-});
-
-// Función para alternar la selección de personajes
+// Actions
 const toggleSelection = (character: CharacterModel) => {
-  if (router.currentRoute.value.name == 'Fight') return;
+  if (countdownStore.isCountdownActive || router.currentRoute.value.name == 'Fight') return;
   selectedCharactersStore.removeCharacter(character);
 };
 
-// Asigna un personaje aleatorio en el índice dado (0 o 1)
 const assignRandomCharacter = (index: number) => {
   if (allCharacters.value.length === 0) return;
 
-  // Seleccionar un personaje aleatorio
   const randomIndex = Math.floor(Math.random() * allCharacters.value.length);
   const randomCharacter = allCharacters.value[randomIndex];
 
-  // Evitar duplicados si el otro personaje ya está seleccionado
   if (selectedCharacters.value.some(c => c?.id === randomCharacter.id)) {
-    assignRandomCharacter(index); // Vuelve a intentarlo
+    assignRandomCharacter(index); // Try again
     return;
   }
 
-  // Agregar el personaje aleatorio en la posición deseada
   selectedCharactersStore.setCharacter(index, randomCharacter);
 };
 
+//Routes
+const router = useRouter();
 const goToCharactersFight = () => {
   if (!selectedCharacters.value[0]?.id || !selectedCharacters.value[1]?.id) return;
 

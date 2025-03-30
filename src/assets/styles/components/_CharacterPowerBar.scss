@@ -1,57 +1,63 @@
-@use '../abstracts/variables' as *;
+@use "../abstracts/variables" as *;
 
 .#{$namespace}ball {
-    width: 100px;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    background-color: #263238;
-    border: 10px solid #263238;
-    &:before {
-        content: "";
-        position: absolute;
-        bottom: 5px;
-        left: 5px;
-        width: calc(100% - 10px);
-        height: calc(100% - 10px);
-        background: linear-gradient(to top left, rgba(255, 255, 255, 0) 70%, rgba(255, 255, 255, 0.2) 90%, rgba(255, 255, 255, 0.8) 100%);
-        box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
-        z-index: 9999;
-    }
-    &:after {
-        content: "";
-        position: absolute;
-        top: 5px;
-        left: 5px;
-        width: calc(100% - 10px);
-        height: calc(100% - 10px);
-        // background: linear-gradient(to top left, rgba(255, 255, 255, 1) 10%, rgba(255, 255, 255, 0) 100%);
-        /* transform: rotate(-90deg); */
-        opacity: 1;
-        z-index: 9999;
-    }
+	pointer-events: none;
+	width: 100px;
+	overflow: hidden;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	background-color: #263238;
+	border: 10px solid #263238;
+	&:before {
+		content: "";
+		position: absolute;
+		bottom: 5px;
+		left: 5px;
+		width: calc(100% - 10px);
+		height: calc(100% - 10px);
+		background: linear-gradient(
+			to top left,
+			rgba(255, 255, 255, 0) 70%,
+			rgba(255, 255, 255, 0.2) 90%,
+			rgba(255, 255, 255, 0.8) 100%
+		);
+		box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+		z-index: 1;
+	}
+	&:after {
+		content: "";
+		position: absolute;
+		top: 5px;
+		left: 5px;
+		width: calc(100% - 10px);
+		height: calc(100% - 10px);
+		// background: linear-gradient(to top left, rgba(255, 255, 255, 1) 10%, rgba(255, 255, 255, 0) 100%);
+		/* transform: rotate(-90deg); */
+		opacity: 1;
+		z-index: 1;
+	}
 
-    svg {
-        position: absolute;
-        bottom: -30px;
-        left: -25px;
-        transform-origin: bottom;
-        transition: transform 0.2s ease-in-out;
-        height: calc(100% + 30px);
-        // width: 100%;
-        // height: 100%;
-        // filter: drop-shadow(0 0 15px rgba(255, 50, 50, 0.9));
-    }
-    &__counter {
-        position: absolute;
-        bottom: 20px;
-        margin: 0 auto;
-        color: white;
-        z-index: 9;
-        font-size: 24px;
-        font-weight: normal;
-        user-select: none;
-    }
+	svg {
+		position: absolute;
+		bottom: -30px;
+		left: -25px;
+		transform-origin: bottom;
+		transition: transform 0.2s ease-in-out;
+		height: calc(100% + 30px);
+		// width: 100%;
+		// height: 100%;
+		// filter: drop-shadow(0 0 15px rgba(255, 50, 50, 0.9));
+	}
+	&__counter {
+		position: absolute;
+		bottom: 20px;
+		margin: 0 auto;
+		color: white;
+		z-index: 9;
+		font-size: 24px;
+		font-weight: normal;
+		user-select: none;
+	}
 }

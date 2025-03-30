@@ -15,15 +15,24 @@
                     </filter>
                 </defs>
 
-                <!-- Rect principal -->
+                <!-- Container Bar -->
                 <rect filter="url(#waveFilter)" :y="1000 - (50 + (counter * 2))" :height="50 + (counter * 2)"
                     width="300" :fill="bgColor" />
 
-                <!-- Barras horizontales -->
+                <!-- Colored Bars - Divisions - -->
                 <g>
                     <template v-for="i in numDivisions" :key="i">
                         <line x1="300" x2="140" :y1="getDivisionY(i) - 30" :y2="getDivisionY(i) - 30" stroke="#ffb74d"
                             stroke-width="4" stroke-opacity="1" />
+                    </template>
+                </g>
+
+                <!-- Animated Circle -->
+                <g>
+                    <template v-for="(division, index) in numDivisions" :key="index">
+                        <circle fill="#fff" :cx="140" :cy="getDivisionY(division) - 30" :r="getRadius(division)"
+                            class="ok-message"
+                            :style="{ opacity: getOpacity(division), transition: 'opacity 1s, r 0.5s' }" />
                     </template>
                 </g>
             </svg>
@@ -31,9 +40,9 @@
     </div>
 </template>
 
-
 <script setup lang="ts">
-import { ref, watch, onMounted, computed } from "vue";
+// Vue & Utilities
+import { ref, watch, computed } from "vue";
 
 // Props
 const props = defineProps({
@@ -49,6 +58,10 @@ const props = defineProps({
         type: String,
         default: "red",
     },
+    index: {
+        type: Number,
+        default: 0
+    }
 });
 
 // Emits
@@ -57,11 +70,13 @@ const emit = defineEmits<{
     (event: "divisionPassed", division: number): void;
 }>();
 
-// Refs
+// Reactive Variables
+
 const ballContainer = ref<HTMLElement | null>(null);
-const svgRef = ref<SVGSVGElement | null>(null);
-const isFlashing = ref(false);
-const passedDivisions = ref<number[]>([]); // Las divisiones que ya se han superado
+const passedDivisions = ref<number[]>([]);
+const messages = ref<{ [key: number]: boolean }>({});
+
+// Watches
 
 watch(() => props.counter, () => {
     if (props.counter <= 0) passedDivisions.value = [];
@@ -71,18 +86,22 @@ watch(() => props.counter, () => {
 
     for (let i = 1; i <= numDivisions.value; i++) {
         const divisionY = getDivisionY(i);
-        // Si hemos sobrepasado la raya y no estaba aún registrada
         if (rectYInSVG <= divisionY && !passedDivisions.value.includes(i)) {
             passedDivisions.value.push(i);
-            emit('divisionPassed', i); // 🔔 Emitimos al padre
+            emit('divisionPassed', i);
+            messages.value[i] = true;
+            setTimeout(() => {
+                messages.value[i] = false;
+            }, 500);
         }
     }
 
-    // Si llegas al top completo
     if (rectYInSVG <= 0) {
         emit('filled');
     }
 });
+
+// Computed
 
 const numDivisions = computed(() => {
     return props.character?.powerstats?.intelligence
@@ -90,10 +109,19 @@ const numDivisions = computed(() => {
         : 1;
 });
 
-// Calcula la posición Y de cada barra desde abajo hacia arriba
+// Actions
+
 function getDivisionY(i: number) {
     const totalHeight = 1000;
     const step = totalHeight / (numDivisions.value + 1);
     return totalHeight - i * step;
+}
+
+function getRadius(division: number): number {
+    return messages.value[division] ? 15 : 0;
+}
+
+function getOpacity(division: number): number {
+    return messages.value[division] ? 1 : 0;
 }
 </script>

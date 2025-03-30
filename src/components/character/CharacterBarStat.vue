@@ -12,6 +12,9 @@
 </template>
 
 <script setup lang="ts">
+
+// Props
+
 defineProps({
     stat: {
         type: String,

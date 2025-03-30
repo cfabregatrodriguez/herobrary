@@ -11,7 +11,7 @@ export const useStatsPlayerStore = defineStore("player", {
 			return {
 				wins: 0,
 				loses: 0,
-				playerId: "",
+				playerId: 1,
 				battles: [] as BattleModel[], // Array de batallas vacío si no hay datos previos
 			};
 		}

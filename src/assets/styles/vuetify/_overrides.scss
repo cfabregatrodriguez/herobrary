@@ -41,8 +41,14 @@
 	.#{$namespace}card__badge {
 		z-index: 9;
 		position: absolute;
-		top: 5px;
-		right: 5px;
+		&--left {
+			top: 5px;
+			left: 5px;
+		}
+		&--right {
+			top: 5px;
+			right: 5px;
+		}
 	}
 }
 
@@ -52,8 +58,4 @@ a {
 	&:hover {
 		text-decoration: none;
 	}
-}
-
-.v-btn {
-	border-radius: 12px;
 }

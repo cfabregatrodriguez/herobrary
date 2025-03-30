@@ -1,145 +1,98 @@
 <template>
-  <v-row>
-    <v-col>
-      <v-container v-if="character">
-        <v-card class="hb-card__detail" :class="{ 'selected': isSelected, 'bg-blue-grey-darken-2': isSelected }"
-          :style="{ minHeight: '300px', width: '300px', maxWidth: '300px' }">
-          <v-img :src="character.images.lg" alt="Character Image" cover style="height: 200px; width: 100%;"></v-img>
-          <div class="rounded-pill bg-brown-darken-3 text-subtitle-2 my-3 d-sm-inline-block px-3 text-white">{{
-            averagePower
-          }}</div>
-          <div class="rounded-pill bg-brown-darken-1 text-subtitle-2 my-3 d-sm-inline-block px-3 text-white">{{
-            averagePowerReal }}</div>
-          <v-card-title>{{ character.name }}</v-card-title>
-          <div class="d-flex justify-center align-center w-100 pb-4">
-            <v-btn variant="tonal" size="small" @click.stop="toggleSelection(character)">
-              <span v-if="isSelected">Remove</span>
-              <span v-else>Add to fight</span>
-            </v-btn>
-          </div>
-          <v-card-text>
-            <CharacterBarStat stat="Intelligence" icon="mdi-brain" color="orange-lighten-2"
-              :value="character.powerstats.intelligence" />
-            <CharacterBarStat stat="Strength" icon="mdi-weight" color="red-lighten-1"
-              :value="character.powerstats.strength" />
-            <CharacterBarStat stat="Speed" icon="mdi-run-fast" color="blue-lighten-1"
-              :value="character.powerstats.speed" />
-            <CharacterBarStat stat="Durability" icon="mdi-wall" color="green-darken-1"
-              :value="character.powerstats.durability" />
-            <CharacterBarStat stat="Power" icon="mdi-lightning-bolt-outline" color="purple-lighten-1"
-              :value="character.powerstats.power" />
-            <CharacterBarStat stat="Combat" icon="mdi-fencing" color="deep-orange-lighten-2"
-              :value="character.powerstats.combat" />
-          </v-card-text>
-          <CharacterBarFight :character="character" />
-          <v-card-subtitle class="py-2">{{ character.biography?.['fullName'] || 'Unknown' }}</v-card-subtitle>
-        </v-card>
+  <v-row v-if="character">
+    <v-col cols="4">
+      <v-container>
+        <Character v-if="character" :character="character" :index="1" :isCharacterPowerBar="false" />
       </v-container>
-      <div v-else>
-        <p>Loading character...</p>
-      </div>
+    </v-col>
+    <v-col>
+      <v-row>
+        <!-- Character biography details -->
+        <v-col>
+          <v-list>
+            <v-list-item class="text-left" :title="'Full Name'"
+              :subtitle="character.biography.fullName || 'Unknown'"></v-list-item>
+            <v-list-item class="text-left" :title="'Alter Egos'"
+              :subtitle="character.biography.alterEgos"></v-list-item>
+            <v-list-item class="text-left" :title="'Aliases'"
+              :subtitle="character.biography.aliases.join(', ')"></v-list-item>
+            <v-list-item class="text-left" :title="'Place of Birth'"
+              :subtitle="character.biography.placeOfBirth || 'Unknown'"></v-list-item>
+            <v-list-item class="text-left" :title="'Alignment'" :subtitle="character.biography.alignment"></v-list-item>
+          </v-list>
+        </v-col>
+
+        <!-- Character appearance details -->
+        <v-col>
+          <v-list>
+            <v-list-item class="text-left" :title="'Gender'" :subtitle="character.appearance.gender"></v-list-item>
+            <v-list-item class="text-left" :title="'Race'"
+              :subtitle="character.appearance.race || 'Unknown'"></v-list-item>
+            <v-list-item class="text-left" :title="'Height'"
+              :subtitle="character.appearance.height.join(' / ')"></v-list-item>
+            <v-list-item class="text-left" :title="'Weight'"
+              :subtitle="character.appearance.weight.join(' / ')"></v-list-item>
+            <v-list-item class="text-left" :title="'Eye Color'" :subtitle="character.appearance.eyeColor"></v-list-item>
+            <v-list-item class="text-left" :title="'Hair Color'"
+              :subtitle="character.appearance.hairColor"></v-list-item>
+            <v-divider></v-divider>
+
+            <v-list-item class="text-left" :title="'First Appearance'"
+              :subtitle="character.biography.firstAppearance"></v-list-item>
+            <v-list-item class="text-left" :title="'Publisher'" :subtitle="character.biography.publisher"></v-list-item>
+          </v-list>
+        </v-col>
+
+        <!-- Character work and connections details -->
+        <v-col>
+          <v-list>
+            <v-list-item class="text-left" :title="'Occupation'" :subtitle="character.work.occupation"></v-list-item>
+            <v-list-item class="text-left" :title="'Base'" :subtitle="character.work.base"></v-list-item>
+
+            <v-divider></v-divider>
+
+            <v-list-item class="text-left" :title="'Group Affiliation'"
+              :subtitle="character.connections.groupAffiliation"></v-list-item>
+            <v-list-item class="text-left" :title="'Relatives'"
+              :subtitle="character.connections.relatives"></v-list-item>
+          </v-list>
+        </v-col>
+      </v-row>
     </v-col>
   </v-row>
 
+  <!-- Loading message while character data is being fetched -->
+  <div v-else>
+    <p>Loading character...</p>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+// Vue & Utilities
+import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { getCharacter } from "@/services/api";
-import { useSelectedCharactersStore } from "@/stores/selectedCharactersStore";
-import CharacterBarFight from "@/components/character/CharacterBarFight.vue";
-import CharacterBarStat from "@/components/character/CharacterBarStat.vue";
-import CharacterPowerBar from "@/components/character/CharacterPowerBar.vue";
+
+// Components
+import Character from "@/components/Character.vue";
 import { CharacterModel } from '@/models/character.model';
 
-
-// Variables reactivas con tipos más estrictos
+// Reactive variables with stricter types
 const character = ref<CharacterModel | null>(null);
 const route = useRoute();
 const characterId = route.params.id as string;
-const selectedCharactersStore = useSelectedCharactersStore();
-const counter = ref(0);
 
-// Escuchar el evento de actualización del contador
-const updateCounter = (newCounterValue: number) => {
-  counter.value = newCounterValue;
-};
-
-// Calculamos el promedio de los powerstats
-const averagePower = computed(() => {
-  if (!character.value) return 0;
-  const stats = character.value.powerstats;
-  const totalPower =
-    stats.intelligence +
-    stats.strength +
-    stats.speed +
-    stats.durability +
-    stats.power +
-    stats.combat;
-  const average = totalPower / 6;
-  return Math.round(average * 10) / 10;
-});
-
-// Cálculo del promedio real ajustado
-const averagePowerReal = computed(() => {
-  if (!character.value) return 0;
-
-  const stats = character.value.powerstats;
-  let totalPower = 0;
-  let count = 0;
-
-  for (const key in stats) {
-    if (stats[key] !== null) {
-      let value = stats[key];
-
-      if ((key === "intelligence" || key === "power") && value === 100) {
-        value *= 5;
-      } else if (value === 100) {
-        value *= 4;
-      } else if (value > 90) {
-        value *= 3;
-      }
-
-      totalPower += value;
-      count++;
-    }
-  }
-
-  const average = count > 0 ? totalPower / count : 0;
-  return Math.round(average * 10) / 10;
-});
-
-// Computado para saber si el personaje está seleccionado
-const isSelected = computed(() => {
-  if (!character.value) return false;
-
-  return selectedCharactersStore.selectedCharacters
-    .filter((character: null) => character !== null) // Filtrar valores nulos
-    .some((selectedCharacter: { id: number | undefined; }) => selectedCharacter.id === character.value?.id);
-});
-
-// Obtener los datos del personaje al montar el componente
+// Fetch character data when the component is mounted
 onMounted(async () => {
   try {
     const data = await getCharacter(characterId);
-    if (data && data.id) { // Verificamos que los datos tienen la estructura esperada
+    if (data && data.id) { // Check if data is valid
       character.value = data;
     } else {
-      console.error("Datos del personaje no válidos");
+      console.error("Invalid character data");
     }
   } catch (error) {
-    console.error("Error al obtener el personaje:", error);
+    console.error("Error fetching character:", error);
   }
 });
-
-// Alternar la selección
-const toggleSelection = (character: CharacterModel) => {
-  if (isSelected.value) {
-    selectedCharactersStore.removeCharacter(character);
-  } else {
-    selectedCharactersStore.addCharacter(character);
-  }
-};
-
 </script>

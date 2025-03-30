@@ -3,15 +3,14 @@
     <div class="hb-barfight d-flex flex-column align-center" v-if="character">
       <v-progress-linear ref="progressBarRef" class="position-relative" style="width: 100%; height: 20px;"
         color="grey lighten-1">
-        <!-- Zonas de color -->
+        <!-- Colored Zones -->
         <template v-for="(zone, index) in coloredZones" :key="index">
           <div class="position-absolute" :style="{
             left: zone.start + 'px',
             width: zone.width + 'px',
             height: '30px',
             backgroundColor: zone.color
-          }">
-          </div>
+          }"></div>
         </template>
 
         <!-- Minibar -->
@@ -21,17 +20,6 @@
           height: '100%',
         }" :class="(isHolding || isAutoClick) && isCountdownActive ? 'hb-barfight__minibar--hit' : ''"></div>
       </v-progress-linear>
-
-      <!-- Información -->
-      <v-row>
-        <v-col>Contador: {{ Math.round(counter * 10) / 10 }}</v-col>
-        <v-col>Bonus: {{ Math.round(bonus * 10) / 10 }}</v-col>
-        <v-col>Penalty: {{ Math.round(penalty * 100) / 100 }}</v-col>
-        <v-col>Speed: {{ Math.round(speed * 10) / 10 }}</v-col>
-        <v-col>Nº zones: {{ coloredZones.length }}</v-col>
-        <v-col>Width zones: {{ Math.round(coloredZones[0]?.width * 10) / 10 }}</v-col>
-        <v-col>Bar width: {{ Math.round(minibarWidth * 10) / 10 }}</v-col>
-      </v-row>
     </div>
 
     <div v-else>
@@ -41,6 +29,7 @@
 </template>
 
 <script setup lang="ts">
+// Vue & Utilities
 import { ref, computed, onMounted, onUnmounted, nextTick } from "vue";
 
 // Props
@@ -52,42 +41,70 @@ const props = defineProps({
   counter: { type: Number, default: 1 },
 });
 
+// Emits
+
 const emit = defineEmits<{
   (event: "updateCounter", value: number): void;
 }>();
 
-// Refs comunes
+// Reactive Variables
+
 const barWidth = ref(0);
 const maxTotalWidth = ref(0);
 const progressBarRef = ref<HTMLElement | null>(null);
 const direction = ref(1);
 const minibarPos = ref(0);
 
-// Refs para jugador
-const baseHoldInterval = 50;
 const isHolding = ref(false);
 let interval: number;
 let holdTimer: number;
 const holdTime = ref(0);
 
-// Refs para jugador auto
-const baseHoldIntervalAuto = 75; //velocidad del intervalo del jugador en modo auto
-const baseChanceToHitAuto = 1; //probabilidad de acertar en modo auto, a mas valor menos probabilidad
-const isAutoClick = ref(false); //el enemigo simula un click
-let intervalAutoClicks: number;
+const isAutoClick = ref(false);
 const autoBonusCounter = ref(1);
+let intervalAutoClicks: number;
 
+// Computed
 
-// === Funciones de cálculo ===
+// Colored Zones
+const coloredZones = computed(() => {
+  if (!props.character || maxTotalWidth.value <= 1) return [];
+  const { combat, power } = props.character.powerstats;
+  return calculateZones(power, combat, maxTotalWidth.value);
+});
 
-// Calcular PowerZone
+// Speed
+const speed = computed(() => {
+  if (!props.character) return 1;
+  return Math.exp((75 - props.character.powerstats.speed / 1.5) * 0.02);
+});
+
+// Minibar Width
+const minibarWidth = computed(() => {
+  if (!props.character) return 20;
+  return Math.max(5, (props.character.powerstats.intelligence / 2 - 10));
+});
+
+// Penalty
+const penalty = computed(() => {
+  if (!props.character) return 4;
+  return (props.counter * ((15 - props.character.powerstats.durability / 10)) / 100);
+});
+
+// Bonus
+const bonus = computed(() => {
+  if (!props.character) return 1;
+  return 1 + props.character.powerstats.strength / 2;
+});
+
+// Actions
+
+// Calculate PowerZone
 function calculatePowerZone(power: number, maxWidth: number) {
-  return {
-    width: (power / 100) * (0.4 * maxWidth)
-  };
+  return { width: (power / 100) * (0.4 * maxWidth) };
 }
 
-// Calcular CombatZones
+// Calculate CombatZones
 function calculateCombatZones(combat: number, maxWidth: number) {
   const combatZones: { width: number }[] = [];
   if (combat <= 20) combatZones.push({ width: 0.1 * maxWidth });
@@ -95,185 +112,40 @@ function calculateCombatZones(combat: number, maxWidth: number) {
   else if (combat <= 80) combatZones.push({ width: 0.2 * maxWidth });
   else if (combat <= 90) combatZones.push({ width: 0.2 * maxWidth }, { width: 0.15 * maxWidth });
   else if (combat <= 99) combatZones.push({ width: 0.25 * maxWidth }, { width: 0.15 * maxWidth });
-  else if (combat === 100) combatZones.push({ width: 0.25 * maxWidth }, { width: 0.25 * maxWidth });
+  else combatZones.push({ width: 0.25 * maxWidth }, { width: 0.25 * maxWidth });
 
   return combatZones;
 }
 
-// Calcular las zonas completas
+// Calculate zones
 function calculateZones(power: number, combat: number, maxWidth: number) {
   const powerZone = { ...calculatePowerZone(power, maxWidth), type: 'power' };
   const combatZones = calculateCombatZones(combat, maxWidth).map(z => ({ ...z, type: 'combat' }));
 
-  // Intercalar las zonas
   const allZones: { width: number, type: string, start: number, color: string }[] = [];
   let i = 0;
 
-  // Intercalamos power y combat
   while (i < powerZone.width || i < combatZones.length) {
     if (i < combatZones.length) {
-      allZones.push({
-        ...combatZones[i],
-        start: 0, // Default start value
-        color: '#ff8a65' // Default color for combat zones
-      });
+      allZones.push({ ...combatZones[i], start: 0, color: '#ff8a65' });
     }
-    if (i < 1) { // Solo agregar 1 zona de tipo 'power'
-      allZones.push({
-        ...powerZone,
-        start: 0, // Default start value
-        color: '#ab47bc' // Default color for power zones
-      });
+    if (i < 1) {
+      allZones.push({ ...powerZone, start: 0, color: '#ab47bc' });
     }
     i++;
   }
 
-  // Calcular el espacio restante y la distribución
   const totalZonesWidth = allZones.reduce((sum, zone) => sum + zone.width, 0);
   const remainingSpace = maxWidth - totalZonesWidth;
   const spaceSize = remainingSpace / (allZones.length + 1);
 
-  // Calcular las posiciones de inicio y asignar colores
   let currentPosition = spaceSize;
   return allZones.map(zone => {
-    const z = {
-      start: currentPosition,
-      width: zone.width,
-      type: zone.type,
-      color: zone.type === 'power' ? '#ab47bc' : '#ff8a65'
-    };
+    const z = { start: currentPosition, width: zone.width, type: zone.type, color: zone.type === 'power' ? '#ab47bc' : '#ff8a65' };
     currentPosition += zone.width + spaceSize;
     return z;
   });
 }
-
-
-// === Computed ===
-
-//Si cualquier parte de la minibarra sobresale fuera de la zona (por izquierda o por derecha), no se considera dentro y devolverá undefined
-//version descartada tras algunas pruebas, la dejamos por si se quisiera recuperar
-// const currentZone = computed(() =>
-//   coloredZones.value.find(
-//     (zone) =>
-//       minibarPos.value >= zone.start &&
-//       minibarPos.value + minibarWidth.value <= zone.start + zone.width
-//   )
-// );
-
-//Si cualquier parte de la minibarra sobresale fuera de la zona (por izquierda o por derecha), se sigue considerando dentro y devolvera true
-const currentZone = computed(() =>
-  coloredZones.value.find(
-    (zone) =>
-      minibarPos.value + minibarWidth.value > zone.start && // El borde derecho de la minibarra entra en la zona
-      minibarPos.value < zone.start + zone.width            // El borde izquierdo de la minibarra aún no ha pasado el final de la zona
-  )
-);
-
-const isInsideColoredZone = computed(() => !!currentZone.value);
-const isInPowerZone = computed(() => currentZone.value?.type === 'power');
-const isInCombatZone = computed(() => currentZone.value?.type === 'combat');
-
-// calcula el nuevo valor del counter según si estamos dentro de una zona coloreada y segun el color de la zona
-const updateCounterValue = () => {
-  let bonusFinal: number;
-  if (isInCombatZone.value) {
-    bonusFinal = bonus.value;
-    clearInterval(holdTimer); //ponemos este limite para que en las zonas de combate no se pueda mantener el boton apretado.
-    holdTime.value = 0;
-  }
-  else {
-    bonusFinal = holdTime.value / 2;
-  }
-
-  let newValue: number;
-  if (isInsideColoredZone.value) {
-    newValue = props.counter + bonusFinal;
-  }
-  else {
-    newValue = props.counter - penalty.value;
-    clearInterval(holdTimer); //ponemos este limite para que no se pueda apretar sin soltar todo el rato, si apretamos y es una zona fuera del color, se resetea el contador
-    holdTime.value = 0;
-  }
-  newValue = Math.max(newValue, 0);
-  emit("updateCounter", newValue);
-};
-
-// calcula el nuevo valor del counter para el modo auto
-const updateCounterValueAuto = () => {
-  // Asegúrate de que currentZone y maxWidth estén correctamente definidas
-
-  const zoneWidth = currentZone.value ? currentZone.value.width : 0;  // Anchura de la zona coloreada
-  const randomValue = Math.random();
-
-  if (randomValue <= 0.95) {
-    autoBonusCounter.value += 1;
-    isAutoClick.value = true;
-  } else {
-    autoBonusCounter.value = 1;
-    isAutoClick.value = false;
-  }
-
-  const bonusFinal = isInCombatZone.value ? bonus.value / 2 : autoBonusCounter.value;
-  let newValue = 0;
-
-  // Cálculo de la precisión basado en la anchura de la zona
-  // baseChanceToHitAuto = 1.5 → hace que 0.2 tenga solo un 8% y 0.4 suba al 25%.
-  // baseChanceToHitAuto = 2 → hace que 0.2 tenga un 4% y 0.4 solo un 16%, pero sube bien al 64% cuando es
-  const factor = 1.3
-  const rawPrecision = Math.pow(zoneWidth, baseChanceToHitAuto);
-  const precision = Math.max(0.05, Math.min(0.95, rawPrecision * factor));
-
-
-  if (isInsideColoredZone.value && randomValue <= precision) {
-    newValue = props.counter + bonusFinal;
-  } else if (randomValue <= 0.1) {
-    autoBonusCounter.value = 1;
-    isAutoClick.value = true;
-    newValue = props.counter - penalty.value;
-  } else {
-    isAutoClick.value = false;
-    newValue = props.counter;
-    autoBonusCounter.value = 1;
-  }
-
-  newValue = Math.max(newValue, 0);
-  emit("updateCounter", newValue);
-};
-
-// coloredZones ahora usa la función calculateZones
-const coloredZones = computed(() => {
-  if (!props.character || maxTotalWidth.value <= 1) return [];
-
-  const { combat, power } = props.character.powerstats;
-  return calculateZones(power, combat, maxTotalWidth.value);
-});
-
-// Computed para la velocidad
-const speed = computed(() => {
-  if (!props.character) return 1;
-  return Math.exp((75 - props.character.powerstats.speed / 1.5) * 0.02);
-});
-
-// Computed para el ancho de la minibarra
-const minibarWidth = computed(() => {
-  if (!props.character) return 20;
-  // A mayor inteligencia, mayor será el valor
-  return Math.max(5, (props.character.powerstats.intelligence / 2 - 10));
-});
-
-// Computed para penalty
-const penalty = computed(() => {
-  if (!props.character) return 4;
-  return (props.counter * ((15 - props.character.powerstats.durability / 10)) / 100);
-});
-
-// Computed para bonus
-const bonus = computed(() => {
-  if (!props.character) return 1;
-  return 1 + props.character.powerstats.strength / 2;
-});
-
-// === Funciones de actualización ===
 
 // Update Bar Width
 const updateBarWidth = () => {
@@ -291,7 +163,7 @@ const updateWidth = () => {
   }
 };
 
-// Mover minibarra
+// Move Minibar
 const moveMinibar = () => {
   minibarPos.value += speed.value * direction.value;
   if (minibarPos.value + minibarWidth.value >= barWidth.value || minibarPos.value <= 0) {
@@ -299,55 +171,77 @@ const moveMinibar = () => {
   }
 };
 
-// Actualizar Hold
+// Update Hold Timer
 const updateHold = () => {
-  if (!props.isCountdownActive) return;  // No actualizar el contador si el countdown no está activo
+  if (!props.isCountdownActive) return;
   if (!isHolding.value) return;
 
   if (isInsideColoredZone.value) {
     holdTime.value++;
-  }
-  else {
+  } else {
     holdTime.value = 0;
   }
 
-  // Actualizar el contador
   updateCounterValue();
 };
 
+// Handle Hold
 const startHold = () => {
   if (!props.isCountdownActive || isHolding.value) return;
-
   isHolding.value = true;
-  holdTime.value = 1; // empezamos en 1 directamente
-
-  holdTimer = setInterval(updateHold, baseHoldInterval);
+  holdTime.value = 1;
+  holdTimer = setInterval(updateHold, 50);
 };
 
+// Stop Hold
 const stopHold = () => {
-  if (!props.isCountdownActive) return;  // Detener solo si el countdown está activo
+  if (!props.isCountdownActive) return;
   isHolding.value = false;
   clearInterval(holdTimer);
 };
 
-// === Eventos de teclado ===
-const handleKeyDown = (event: KeyboardEvent) => {
-  if (!props.isCountdownActive) return;  // Solo permite comenzar si el countdown está activo
-  if (event.code === "Space") {
-    event.preventDefault();
-    startHold();
-  }
+// Counter Update
+const updateCounterValue = () => {
+  let bonusFinal = isInCombatZone.value ? bonus.value : holdTime.value / 2;
+  let newValue = isInsideColoredZone.value ? props.counter + bonusFinal : props.counter - penalty.value;
+  newValue = Math.max(newValue, 0);
+  emit("updateCounter", newValue);
 };
 
-const handleKeyUp = (event: KeyboardEvent) => {
-  if (!props.isCountdownActive) return;  // Solo permite detener si el countdown está activo
-  if (event.code === "Space") {
-    event.preventDefault();
-    stopHold();
+// Auto Update Counter
+const updateCounterValueAuto = () => {
+  const zoneWidth = currentZone.value ? currentZone.value.width : 0;
+  const randomValue = Math.random();
+
+  if (randomValue <= 0.95) {
+    autoBonusCounter.value += 1;
+    isAutoClick.value = true;
+  } else {
+    autoBonusCounter.value = 1;
+    isAutoClick.value = false;
   }
+
+  const bonusFinal = isInCombatZone.value ? bonus.value / 2 : autoBonusCounter.value;
+  let newValue = 0;
+
+  const precision = Math.max(0.05, Math.min(0.95, Math.pow(zoneWidth, 1.3) * 1.3));
+  if (isInsideColoredZone.value && randomValue <= precision) {
+    newValue = props.counter + bonusFinal;
+  } else if (randomValue <= 0.1) {
+    autoBonusCounter.value = 1;
+    isAutoClick.value = true;
+    newValue = props.counter - penalty.value;
+  } else {
+    isAutoClick.value = false;
+    newValue = props.counter;
+    autoBonusCounter.value = 1;
+  }
+
+  newValue = Math.max(newValue, 0);
+  emit("updateCounter", newValue);
 };
 
-// === Lifecycle Hooks ===
+// Lifecycle Hooks
 onMounted(() => {
   nextTick(updateBarWidth);
   nextTick(updateWidth);
@@ -355,22 +249,18 @@ onMounted(() => {
 
   interval = setInterval(moveMinibar, 12);
 
-  // Si está en modo auto, establece el intervalo para aumentar o reducir el contador
   if (props.isAuto) {
     intervalAutoClicks = setInterval(() => {
       if (props.isCountdownActive) {
         updateCounterValueAuto();
       }
-    }, baseHoldIntervalAuto);
+    }, 75);
   } else {
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
   }
-
 });
 
-
-// Limpiar los intervalos cuando el countdown termina
 onUnmounted(() => {
   clearInterval(interval);
   clearInterval(holdTimer);
@@ -379,4 +269,34 @@ onUnmounted(() => {
   window.removeEventListener("keydown", handleKeyDown);
   window.removeEventListener("keyup", handleKeyUp);
 });
+
+// Keyboard Events
+const handleKeyDown = (event: KeyboardEvent) => {
+  if (!props.isCountdownActive) return;
+  if (event.code === "Space") {
+    event.preventDefault();
+    startHold();
+  }
+};
+
+const handleKeyUp = (event: KeyboardEvent) => {
+  if (!props.isCountdownActive) return;
+  if (event.code === "Space") {
+    event.preventDefault();
+    stopHold();
+  }
+};
+
+// Watchers
+const currentZone = computed(() =>
+  coloredZones.value.find(
+    (zone) =>
+      minibarPos.value + minibarWidth.value > zone.start &&
+      minibarPos.value < zone.start + zone.width
+  )
+);
+const isInsideColoredZone = computed(() => !!currentZone.value);
+const isInPowerZone = computed(() => currentZone.value?.type === 'power');
+const isInCombatZone = computed(() => currentZone.value?.type === 'combat');
+
 </script>

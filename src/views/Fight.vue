@@ -1,17 +1,26 @@
 <template>
     <div>
         <v-row>
+            <!-- Character 1 -->
             <v-col cols="5" class="pt-0 pr-0">
-                <Character v-if="character" :character="character" :counter="counter" :bgColor="bgColor" :isAuto="true"
-                    @divisionPassed="handleDivisionPassed" @counterChange="handleCounterChange"
-                    @filled="handleFilled" />
+                <Character v-if="character" :character="selectedCharactersStore.getCharacterByIndex(0)"
+                    :counter="counter" :bgColor="bgColor" :isAuto="true" @divisionPassed="handleDivisionPassed"
+                    @counterChange="handleCounterChange" @filled="handleFilled" :index="0"
+                    :isCharacterPowerBar="true" />
             </v-col>
+
+            <!-- Fight control and instructions -->
             <v-col cols="2" class="d-sm-flex align-center justify-center">
                 <div>
+                    <!-- Countdown timer -->
                     <Countdown v-show="countdownStore.isCountdownActive" class="mb-8" ref="countdownRef" :maxCount="20"
                         @finished="handleFinish" />
+
+                    <!-- Button to start the fight -->
                     <v-btn v-show="!countdownStore.isCountdownActive" class="mt-8 permanent-marker-regular"
-                        @click="startCountdown" size="x-large">Start</v-btn>
+                        @click="startCountdown" icon="" variant="text" width="100" height="100" border>Fight</v-btn>
+
+                    <!-- Instructions displayed when countdown is not active -->
                     <div v-show="!countdownStore.isCountdownActive" class="ma-8">
                         <p class="text-caption">Press the Start button to begin the fight.</p>
                         <p class="text-caption">Press the spacebar and hold when the marker passes over the blue bars to
@@ -19,10 +28,13 @@
                     </div>
                 </div>
             </v-col>
+
+            <!-- Character 2 -->
             <v-col cols="5" class="pt-0 pl-0">
-                <Character v-if="character2" :character="character2" :counter="counter2" :bgColor="bgColor2"
-                    :isAuto="true" @divisionPassed="handleDivisionPassed2" @counterChange="handleCounterChange2"
-                    @filled="handleFilled2" />
+                <Character v-if="character2" :character="selectedCharactersStore.getCharacterByIndex(1)"
+                    :counter="counter2" :bgColor="bgColor2" :isAuto="true" @divisionPassed="handleDivisionPassed2"
+                    @counterChange="handleCounterChange2" @filled="handleFilled2" :index="1"
+                    :isCharacterPowerBar="true" />
             </v-col>
         </v-row>
     </div>
@@ -31,21 +43,24 @@
 <script setup lang="ts">
 // Vue & Utilities
 import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
 import { getCharacter } from "@/services/api";
+
+// Models
 import { CharacterModel } from '@/models/character.model';
 
 // Pinia Stores
 import { useStatsPlayerStore } from "@/stores/statsPlayerStore";
 const statsPlayerStore = useStatsPlayerStore();
 import { useCountdownStore } from '@/stores/countdownStore';
-const countdownStore = useCountdownStore();  // Usamos la store de countdown
+const countdownStore = useCountdownStore();  // Countdown store for managing countdown logic
+import { useSelectedCharactersStore } from "@/stores/selectedCharactersStore";
+const selectedCharactersStore = useSelectedCharactersStore();
 
 // Components
 import Character from '@/components/Character.vue';
 import Countdown from "@/components/Countdown.vue";
 
-// Reactive state  
+// Reactive Variables
 const counter = ref(0);
 const counter2 = ref(0);
 const character = ref<CharacterModel | null>(null);
@@ -55,51 +70,47 @@ const bgColor = ref('#3498db');
 const bgColor2 = ref('red');
 const totalBarsPassed = ref(0);
 
-// Route handling
-const route = useRoute();
-const characterId = route.params.id as string;
-const characterId2 = route.params.vs as string;
 
+// Actions
 
-// Counter update logic 
+// Counter change logic
 const handleCounterChange = (value: number) => {
     counter.value = value;
-    if (counter.value < 0) counter.value = 0; // Asegurar que no sea negativo
+    if (counter.value < 0) counter.value = 0; // Ensure counter doesn't go negative
 };
 
 const handleCounterChange2 = (value: number) => {
     counter2.value = value;
-    if (counter2.value < 0) counter2.value = 0; // Asegurar que no sea negativo
+    if (counter2.value < 0) counter2.value = 0; // Ensure counter doesn't go negative
 };
 
-// Win logic
+// Win and loss handling
 const handleFilled = () => {
-    // Llamamos a la acción de la store para registrar una victoria y la batalla
+    // Record a win and battle stats
     statsPlayerStore.recordWin();
     statsPlayerStore.addBattle(
-        Number(characterId),  // characterId
-        Number(characterId2), // enemyCharacterId
+        Number(selectedCharactersStore.getCharacterByIndex(0).id),  // characterId
+        Number(selectedCharactersStore.getCharacterByIndex(1).id), // enemyCharacterId
         counter.value,        // playerEnergy
         counter2.value        // enemyEnergy
     );
     handleFinish();
-    console.log('WIN: ', statsPlayerStore)
+    console.log('WIN: ', statsPlayerStore);
 };
 
 const handleFilled2 = () => {
-    // Llamamos a la acción de la store para registrar una derrota y la batalla
+    // Record a loss and battle stats
     statsPlayerStore.recordLoss();
     statsPlayerStore.addBattle(
-        Number(characterId),  // characterId
-        Number(characterId2), // enemyCharacterId
+        Number(selectedCharactersStore.getCharacterByIndex(0).id),  // characterId
+        Number(selectedCharactersStore.getCharacterByIndex(1).id), // enemyCharacterId
         counter.value,        // playerEnergy
         counter2.value        // enemyEnergy
     );
     handleFinish();
-    console.log('LOST: ', statsPlayerStore)
+    console.log('LOST: ', statsPlayerStore);
 };
 
-// Bar passed logic
 const handleDivisionPassed = (passedBars: number) => {
     totalBarsPassed.value = passedBars;
 };
@@ -108,36 +119,35 @@ const handleDivisionPassed2 = (passedBars: number) => {
     totalBarsPassed.value = passedBars;
 };
 
-// Countdown logic 
 const startCountdown = () => {
     counter2.value = 0;
     counter.value = 0;
-    countdownStore.startCountdown();  // Usamos la store para activar la cuenta atrás
+    countdownStore.startCountdown();  // Activate countdown using the store
 
     if (countdownRef.value) {
         countdownRef.value.startCounting();
     } else {
-        console.error("countdownRef no está disponible");
+        console.error("countdownRef is not available");
     }
-}
+};
 
 const handleFinish = () => {
-    countdownStore.stopCountdown();  // Usamos la store para desactivar la cuenta atrás
+    countdownStore.stopCountdown();  // Stop countdown using the store
 };
 
 onMounted(async () => {
     try {
-        character.value = await getCharacter(characterId);
+        character.value = await getCharacter(selectedCharactersStore.getCharacterByIndex(0).id);
     } catch (error) {
-        console.error("Error al obtener el personaje 1:", error);
-        character.value = {} as CharacterModel; // Evita que sea null
+        console.error("Error fetching character 1:", error);
+        character.value = {} as CharacterModel; // Prevent null
     }
 
     try {
-        character2.value = await getCharacter(characterId2);
+        character2.value = await getCharacter(selectedCharactersStore.getCharacterByIndex(1).id);
     } catch (error) {
-        console.error("Error al obtener el personaje 2:", error);
-        character2.value = {} as CharacterModel; // Evita que sea null
+        console.error("Error fetching character 2:", error);
+        character2.value = {} as CharacterModel; // Prevent null
     }
 });
 </script>
