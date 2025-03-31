@@ -1,44 +1,31 @@
 import { defineStore } from "pinia";
+// Ensure the correct path to CharacterModel
+import { CharacterModel } from "@/models/character.model"; // Adjusted the path
 
 export const useSelectedCharactersStore = defineStore("selectedCharacters", {
 	state: () => ({
 		selectedCharacters: JSON.parse(
-			localStorage.getItem("selectedCharacters") || "[]"
+			localStorage.getItem("selectedCharacters") || "[null, null]"
 		),
 	}),
 
 	actions: {
-		addCharacter(character: any) {
+		addCharacter(character: CharacterModel) {
 			// Verificar si el personaje ya está en el array
-			if (!this.selectedCharacters.some((item) => item?.id === character.id)) {
-				// Verificar si hay dos elementos no nulos
-				const nonNullCharacters = this.selectedCharacters.filter(
-					(item) => item !== null
+			if (
+				!this.selectedCharacters.some(
+					(item: CharacterModel | null) => item?.id === character.id
+				)
+			) {
+				// Buscar la primera posición vacía (null) en el array
+				const emptyIndex = this.selectedCharacters.findIndex(
+					(item: CharacterModel | null) => item === null
 				);
-
-				if (nonNullCharacters.length < 2) {
-					// Buscar la primera posición vacía (null) en el array
-					const emptyIndex = this.selectedCharacters.findIndex(
-						(item) => item === null
-					);
-					if (emptyIndex > -1) {
-						// Reemplazar la posición vacía
-						this.selectedCharacters[emptyIndex] = character;
-					} else {
-						// Si no hay posiciones vacías, agregar al final
-						this.selectedCharacters.push(character);
-					}
-				} else {
-					// Si ya hay dos elementos no nulos, sustituir el segundo
-					const secondNonNullIndex = this.selectedCharacters.findIndex(
-						(item) => item !== null && item === nonNullCharacters[1]
-					);
-					if (secondNonNullIndex > -1) {
-						this.selectedCharacters[secondNonNullIndex] = character;
-					}
+				if (emptyIndex > -1) {
+					this.selectedCharacters[emptyIndex] = character;
 				}
 
-				// Guardar el array actualizado en el localStorage
+				// Guardar en localStorage
 				localStorage.setItem(
 					"selectedCharacters",
 					JSON.stringify(this.selectedCharacters)
@@ -46,12 +33,11 @@ export const useSelectedCharactersStore = defineStore("selectedCharacters", {
 			}
 		},
 
-		removeCharacter(character: any) {
+		removeCharacter(character: CharacterModel) {
 			const index = this.selectedCharacters.findIndex(
-				(item) => item?.id === character.id
+				(item: CharacterModel | null) => item?.id === character.id
 			);
 			if (index > -1) {
-				// Marcar la posición como vacía (null) en lugar de eliminarla
 				this.selectedCharacters[index] = null;
 				localStorage.setItem(
 					"selectedCharacters",
@@ -61,28 +47,40 @@ export const useSelectedCharactersStore = defineStore("selectedCharacters", {
 		},
 
 		clearSelection() {
-			this.selectedCharacters = [];
-			localStorage.removeItem("selectedCharacters");
-		},
-
-		setCharacter(index: number, character: any) {
-			this.selectedCharacters[index] = character;
+			this.selectedCharacters = [null, null]; // Mantener dos espacios fijos
 			localStorage.setItem(
 				"selectedCharacters",
 				JSON.stringify(this.selectedCharacters)
 			);
 		},
 
-		// Acción para obtener un personaje por su índice
+		setCharacter(index: number, character: any) {
+			if (index >= 0 && index < this.selectedCharacters.length) {
+				this.selectedCharacters[index] = character;
+				localStorage.setItem(
+					"selectedCharacters",
+					JSON.stringify(this.selectedCharacters)
+				);
+			}
+		},
+
 		getCharacterByIndex(index: number) {
 			return this.selectedCharacters[index] || null;
+		},
+
+		checkIfArrayHasElementsInBothPositions() {
+			return (
+				this.selectedCharacters[0] !== null &&
+				this.selectedCharacters[1] !== null
+			);
 		},
 	},
 
 	getters: {
 		isCharacterSelected: (state) => (character: any) => {
-			// Compara por el ID del personaje
-			return state.selectedCharacters.some((item) => item?.id === character.id);
+			return state.selectedCharacters.some(
+				(item: CharacterModel | null) => item?.id === character.id
+			);
 		},
 	},
 });

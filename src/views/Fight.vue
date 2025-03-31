@@ -91,8 +91,10 @@ const handleFilled = () => {
     statsPlayerStore.addBattle(
         Number(selectedCharactersStore.getCharacterByIndex(0).id),  // characterId
         Number(selectedCharactersStore.getCharacterByIndex(1).id), // enemyCharacterId
-        counter.value,        // playerEnergy
-        counter2.value        // enemyEnergy
+        counter.value,
+        counter2.value,
+        character.value?.images.xs,
+        character2.value?.images.xs
     );
     handleFinish();
     console.log('WIN: ', statsPlayerStore);
@@ -104,8 +106,10 @@ const handleFilled2 = () => {
     statsPlayerStore.addBattle(
         Number(selectedCharactersStore.getCharacterByIndex(0).id),  // characterId
         Number(selectedCharactersStore.getCharacterByIndex(1).id), // enemyCharacterId
-        counter.value,        // playerEnergy
-        counter2.value        // enemyEnergy
+        counter.value,
+        counter2.value,
+        character.value?.images.xs,
+        character2.value?.images.xs
     );
     handleFinish();
     console.log('LOST: ', statsPlayerStore);
@@ -123,7 +127,6 @@ const startCountdown = () => {
     counter2.value = 0;
     counter.value = 0;
     countdownStore.startCountdown();  // Activate countdown using the store
-
     if (countdownRef.value) {
         countdownRef.value.startCounting();
     } else {

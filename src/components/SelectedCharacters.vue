@@ -1,10 +1,8 @@
 <template>
   <div>
-    <!-- Character selection (Slot 1) -->
-    <div v-if="selectedCharacters.length > 0 || 4" class="w-100 justify-center">
+    <div class="w-100 justify-center">
       <v-btn :disabled="countdownStore.isCountdownActive" size="x-small" @click="assignRandomCharacter(0)">RND</v-btn>
 
-      <!-- Tooltip for selected character (Slot 1) -->
       <v-tooltip v-if="selectedCharacters[0]" location="top">
         <template v-slot:activator="{ props }">
           <v-avatar size="50" @click="toggleSelection(selectedCharacters[0])" v-bind="props"
@@ -16,11 +14,8 @@
         </template>
         <span>{{ selectedCharacters[0] ? selectedCharacters[0].name : 'Empty Slot' }}</span>
       </v-tooltip>
-
-      <!-- Avatar for empty slot if no character is selected (Slot 1) -->
       <v-avatar v-else color="#B0BEC5" size="50"></v-avatar>
 
-      <!-- Fight button (only enabled if countdown is inactive and characters are selected) -->
       <v-btn variant="outlined" class="mx-4" @click="goToCharactersFight"
         :disabled="countdownStore.isCountdownActive || !canFight">
         Start
@@ -38,8 +33,6 @@
         </template>
         <span>{{ selectedCharacters[1] ? selectedCharacters[1].name : 'Empty Slot' }}</span>
       </v-tooltip>
-
-      <!-- Avatar for empty slot if no character is selected (Slot 2) -->
       <v-avatar v-else color="#B0BEC5" size="50"></v-avatar>
 
       <v-btn :disabled="countdownStore.isCountdownActive" size="x-small" @click="assignRandomCharacter(1)">RND</v-btn>
@@ -85,7 +78,7 @@ const assignRandomCharacter = (index: number) => {
   const randomIndex = Math.floor(Math.random() * allCharacters.value.length);
   const randomCharacter = allCharacters.value[randomIndex];
 
-  if (selectedCharacters.value.some(c => c?.id === randomCharacter.id)) {
+  if (selectedCharacters.value.some((c: CharacterModel | null) => c?.id === randomCharacter.id)) {
     assignRandomCharacter(index); // Try again
     return;
   }
@@ -99,8 +92,7 @@ const goToCharactersFight = () => {
   if (!selectedCharacters.value[0]?.id || !selectedCharacters.value[1]?.id) return;
 
   router.push({
-    name: 'Fight',
-    params: { id: selectedCharacters.value[0].id.toString(), vs: selectedCharacters.value[1].id.toString() },
+    name: 'Fight'
   });
 };
 </script>

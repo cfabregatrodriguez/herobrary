@@ -33,7 +33,7 @@
           <v-list dense>
             <v-item-group v-if="battles.length">
               <v-list-item v-for="(battle, index) in battles" :key="index">
-                <v-list-item-title class="text-caption">
+                <v-list-item-title class="text-caption mb-2">
                   <strong>Battle {{ index + 1 }}</strong>
                 </v-list-item-title>
                 <v-list-item-subtitle>
@@ -51,15 +51,13 @@
                       {{ Math.round(battle.playerEnergy) }} vs {{ Math.round(battle.enemyEnergy) }}
                     </v-col>
                     <v-col cols="2">
-                      <v-chip v-if="Math.round(battle.playerEnergy) > Math.round(battle.enemyEnergy)"
-                        prepend-icon="mdi-check-bold" class="ma-2" color="green" variant="flat">
-                      </v-chip>
-                      <v-chip v-else prepend-icon="mdi-close-thick" class="ma-2" color="red" variant="flat">
-                      </v-chip>
+                      <v-icon v-if="Math.round(battle.playerEnergy) > Math.round(battle.enemyEnergy)" color="green"
+                        icon="mdi-check-bold" size="large"></v-icon>
+                      <v-icon v-else color="red" icon="mdi-close-thick" size="large"></v-icon>
                     </v-col>
                   </v-row>
                 </v-list-item-subtitle>
-                <v-divider></v-divider>
+                <v-divider class="mt-2"></v-divider>
               </v-list-item>
             </v-item-group>
             <v-list-item v-else>
@@ -94,15 +92,17 @@ const loses = computed(() => statsPlayerStore.loses);
 const battles = computed(() => statsPlayerStore.battles);
 
 // Actions
-const fetchAvatars = async (battle: any) => {
-  try {
-    const characterDetails = await getCharacter(battle.characterId.toString());
-    const enemyDetails = await getCharacter(battle.enemyCharacterId.toString());
+const fetchAvatars = (battle: any) => {
+  if (battle.characterAvatar) {
+    battle.characterAvatar = battle.characterAvatar; // Ya está en el estado
+  } else {
+    console.error('No se encontraron imágenes para el personaje:', battle.characterId);
+  }
 
-    battle.characterAvatar = characterDetails.images.xs;
-    battle.enemyCharacterAvatar = enemyDetails.images.xs;
-  } catch (error) {
-    console.error('Error fetching character avatars:', error);
+  if (battle.enemyCharacterAvatar) {
+    battle.enemyCharacterAvatar = battle.enemyCharacterAvatar; // Ya está en el estado
+  } else {
+    console.error('No se encontraron imágenes para el enemigo:', battle.enemyCharacterId);
   }
 };
 
@@ -112,9 +112,10 @@ const clearBattles = () => {
 };
 
 const fetchBattleAvatars = async () => {
-  for (let battle of battles.value) {
-    await fetchAvatars(battle);
-  }
+  const avatarPromises = battles.value.map((battle: { characterId: number; enemyCharacterId: number; characterAvatar?: string; enemyCharacterAvatar?: string }) =>
+    fetchAvatars(battle)
+  );
+  await Promise.all(avatarPromises);
 };
 
 // Watchers

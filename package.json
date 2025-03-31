@@ -1,27 +1,37 @@
 {
-  "name": "herobrary",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@mdi/font": "^7.4.47",
-    "axios": "^1.8.4",
-    "pinia": "^3.0.1",
-    "vue": "^3.5.13",
-    "vue-router": "^4.5.0",
-    "vuetify": "^3.7.18"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-vue": "^5.2.1",
-    "@vue/tsconfig": "^0.7.0",
-    "sass-embedded": "^1.86.0",
-    "typescript": "~5.7.2",
-    "vite": "^6.2.0",
-    "vue-tsc": "^2.2.4"
-  }
+	"name": "herobrary",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "vue-tsc -b && vite build",
+		"preview": "vite preview",
+		"test": "vitest"
+	},
+	"dependencies": {
+		"@mdi/font": "^7.4.47",
+		"pinia": "^3.0.1",
+		"vue": "^3.5.13",
+		"vue-router": "^4.5.0",
+		"vuetify": "^3.7.18"
+	},
+	"devDependencies": {
+		"@pinia/testing": "^1.0.0",
+		"@testing-library/jest-dom": "^6.6.3",
+		"@testing-library/vue": "^8.1.0",
+		"@types/fetch-mock": "^7.3.8",
+		"@types/node": "^22.13.14",
+		"@types/testing-library__vue": "^5.0.0",
+		"@vitejs/plugin-vue": "^5.2.3",
+		"@vue/test-utils": "^2.4.6",
+		"@vue/tsconfig": "^0.7.0",
+		"fetch-mock": "^11.1.5",
+		"happy-dom": "^17.4.4",
+		"sass-embedded": "^1.86.0",
+		"typescript": "~5.7.2",
+		"vite": "^6.2.3",
+		"vitest": "^3.0.9",
+		"vue-tsc": "^2.2.4"
+	}
 }

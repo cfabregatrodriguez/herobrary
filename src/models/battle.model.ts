@@ -4,4 +4,6 @@ export interface BattleModel {
 	enemyCharacterId: number;
 	playerEnergy: number;
 	enemyEnergy: number;
+	characterAvatar: string;
+	enemyCharacterAvatar: string;
 }

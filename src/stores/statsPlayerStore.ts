@@ -43,7 +43,9 @@ export const useStatsPlayerStore = defineStore("player", {
 			characterId: number,
 			enemyCharacterId: number,
 			playerEnergy: number,
-			enemyEnergy: number
+			enemyEnergy: number,
+			characterAvatar: string,
+			enemyCharacterAvatar: string
 		) {
 			const battle: BattleModel = {
 				playerId: Number(this.playerId),
@@ -51,6 +53,8 @@ export const useStatsPlayerStore = defineStore("player", {
 				enemyCharacterId,
 				playerEnergy,
 				enemyEnergy,
+				characterAvatar,
+				enemyCharacterAvatar,
 			};
 			this.battles.push(battle);
 			if (this.battles.length > 50) {

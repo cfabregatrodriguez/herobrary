@@ -1,36 +1,40 @@
 <template>
     <v-container v-if="character" class="pa-0">
-        <v-card @click="router.currentRoute.value.name !== 'Fight' ? goToDetail() : null" :class="['v-card--chara' + characterNum, 'hb-card', 'hb-card--nocut', {
+        <v-card :class="['v-card--chara' + characterNum, 'hb-card', 'hb-card--nocut', {
             'selected': isSelected,
-            'bg-blue-grey-darken-2': isSelected && router.currentRoute.value.name !== 'Fight'
+            'bg-blue-grey-darken-2': isSelected && router?.currentRoute.value.name !== 'Fight'
         }]" class="mx-auto">
             <v-badge
                 :class="{ 'hb-card__badge': true, 'hb-card__badge--left': index === 1, 'hb-card__badge--right': index !== 1 }"
                 color="white" :content="getRank(props.character)" inline></v-badge>
-            <v-badge v-if="isSelected && router.currentRoute.value.name !== 'Fight'"
+            <v-badge v-if="isSelected && router?.currentRoute.value.name !== 'Fight'"
                 class="hb-card__badge hb-card__badge--right" color="white" content="selected" inline></v-badge>
-            <v-img :src="character.images.md" alt="Character Image" cover
+            <v-img @click="router?.currentRoute.value.name !== 'Fight' ? goToDetail() : null"
+                :src="character.images?.md || ''" alt="Character Image" cover
                 :style="{ height: compact ? '200px' : '300px', width: '100%' }" />
             <v-card-title>{{ character.name }}</v-card-title><!-- Botón de selección -->
-            <div v-if="router.currentRoute.value.name !== 'Fight'"
+            <div v-if="router?.currentRoute.value.name !== 'Fight'"
                 class="d-flex justify-center align-center w-100 pb-4">
-                <v-btn variant="tonal" size="small" @click.stop="toggleSelection(character)">
+                <v-btn v-if="isSelected" variant="tonal" size="small" @click.stop="toggleSelection(character)">
                     <span v-if="isSelected">Remove</span>
-                    <span v-else>Add to fight</span>
                 </v-btn>
+                <v-btn v-else variant="tonal" size="small" @click.stop="toggleSelection(character)"
+                    :disabled="selectedCharactersStore.checkIfArrayHasElementsInBothPositions()">
+                    <span>Add to fight</span>
+                </v-btn>
+
+
             </div>
             <div v-if="isCharacterStats" class="ma-4">
                 <CharacterStats :character="character" density="compact" />
             </div>
             <v-card-subtitle class="pt-2" :class="{ 'pb-2': !isCharacterPublisher }"
-                v-text="character.biography.fullName || character.name" />
+                v-text="character.biography?.fullName || character.name" />
             <v-card-subtitle v-if="isCharacterPublisher" class="pb-2 text-subtitle-2 opacity-30"
-                v-text="character.biography.publisher || 'Unknown'" />
+                v-text="character.biography?.publisher || 'Unknown'" />
         </v-card>
     </v-container>
 </template>
-
-
 
 <script setup lang="ts">
 // Vue & Utilities
@@ -43,7 +47,7 @@ import CharacterStats from "@/components/character/CharacterStats.vue";
 // Models
 import { CharacterModel } from '@/models/character.model';
 
-//Pinia Stores
+// Pinia Stores
 import { useSelectedCharactersStore } from "@/stores/selectedCharactersStore";
 const selectedCharactersStore = useSelectedCharactersStore();
 
@@ -51,16 +55,15 @@ const selectedCharactersStore = useSelectedCharactersStore();
 const props = defineProps({
     character: {
         type: Object as () => CharacterModel,
-        required: true,
-        default: () => ({} as CharacterModel)
+        required: true
     },
     characterNum: {
         type: Number,
-        default: 0
+        required: true
     },
     index: {
         type: Number,
-        default: 0
+        required: true
     },
     isCharacterStats: {
         type: Boolean,
@@ -73,20 +76,17 @@ const props = defineProps({
     compact: {
         type: Boolean,
         default: false
-    },
+    }
 });
 
+// Computed
+const isSelected = computed(() => {
+    return selectedCharactersStore.selectedCharacters.some(
+        (selectedCharacter: CharacterModel) => selectedCharacter?.id === props.character?.id
+    );
+});
 
 // Actions
-
-const isSelected = computed(() => {
-    if (!props.character) return false;
-
-    return selectedCharactersStore.selectedCharacters
-        .filter((character: null) => character !== null)
-        .some((selectedCharacter: { id: number | undefined; }) => selectedCharacter.id === props.character?.id);
-});
-
 const toggleSelection = (character: CharacterModel) => {
     if (isSelected.value) {
         selectedCharactersStore.removeCharacter(props.character);
@@ -97,7 +97,14 @@ const toggleSelection = (character: CharacterModel) => {
 
 const getRank = (character: CharacterModel) => {
     if (!character || !character.powerstats) return 0;
-    const { intelligence, strength, speed, durability, power, combat } = character.powerstats;
+    const {
+        intelligence = 0,
+        strength = 0,
+        speed = 0,
+        durability = 0,
+        power = 0,
+        combat = 0
+    } = character.powerstats;
     return (Math.round((intelligence + strength + speed + durability + power + combat) / 6));
 };
 

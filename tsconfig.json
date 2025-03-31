@@ -12,7 +12,8 @@
 			"@/*": ["src/*"] // Esto indica que cualquier importación que use @/ se resolverá en src/
 		},
 		"resolveJsonModule": true,
-		"isolatedModules": true
+		"isolatedModules": true,
+		"types": ["vitest/globals", "@pinia/testing"]
 	},
 	"include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
 	"exclude": ["node_modules"]

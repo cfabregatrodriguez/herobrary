@@ -1,7 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Detail from "@/views/Detail.vue"; // Vista de detalle para un personaje
-import List from "@/views/List.vue"; // Vista de listado
-import Fight from "@/views/Fight.vue"; // Vista de lucha
 
 const routes = [
 	{
