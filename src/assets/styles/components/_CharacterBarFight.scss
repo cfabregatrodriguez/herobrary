@@ -3,18 +3,18 @@
 .#{$namespace}barfight {
 	.v-progress-linear {
 		height: 50px !important;
-		background-color: #263238;
+		background-color: rgba(var(--v-theme-primary), 1);
 		max-width: 100%;
 		&__background {
-			border: 10px solid #263238;
+			border: 10px solid rgba(var(--v-theme-primary), 1);
 		}
 	}
 	&__minibar {
 		background-color: #b0bec5;
-		border-right: 2px solid #263238;
-		border-left: 2px solid #263238;
-		border-top: 8px solid #455a64;
-		border-bottom: 8px solid #455a64;
+		border-right: 2px solid rgba(var(--v-theme-accent), 1);
+		border-left: 2px solid rgba(var(--v-theme-accent), 1);
+		border-top: 8px solid rgba(var(--v-theme-accent), 1);
+		border-bottom: 8px solid rgba(var(--v-theme-accent), 1);
 		z-index: 999;
 		&--hit {
 			box-shadow: 0 0 10px rgba(255, 255, 255, 0.5),

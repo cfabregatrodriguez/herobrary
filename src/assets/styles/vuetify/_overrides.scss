@@ -1,9 +1,36 @@
 @use "../abstracts/variables" as *;
 
+.v-application__wrap {
+	min-height: fit-content !important;
+}
+
+.v-pagination {
+	.v-btn {
+		border-radius: 0;
+	}
+	.v-pagination__item--is-active {
+		.v-btn__content {
+			color: #fff !important;
+			opacity: 1;
+			z-index: 9;
+		}
+		.v-btn__overlay {
+			background-color: rgba(var(--v-theme-primary), 1) !important;
+			opacity: 1 !important;
+		}
+	}
+}
+
+.v-select__content .v-list {
+	background-color: #f0f0f0 !important; /* Cambia el color de fondo aquí */
+}
+
 .v-card.#{$namespace}card {
 	box-shadow: none;
 	border-radius: 0;
-	background-color: #263238;
+	&.selected {
+		background-color: rgba(var(--v-theme-surface-light), 1);
+	}
 	.v-card-title {
 		color: #fff;
 		text-transform: uppercase;
@@ -38,22 +65,18 @@
 	.v-btn {
 		color: #fff;
 	}
-	.#{$namespace}card__badge {
-		z-index: 9;
-		position: absolute;
-		&--left {
-			top: 5px;
-			left: 5px;
-		}
-		&--right {
-			top: 5px;
-			right: 5px;
-		}
+}
+
+.v-list {
+	background-color: transparent;
+	.v-list-item:hover > .v-list-item__overlay {
+		opacity: 0.2;
+		background-color: #fff;
 	}
 }
 
 a {
-	color: #263238;
+	color: rgba(var(--v-theme-primary), 1);
 	text-decoration: none;
 	&:hover {
 		text-decoration: none;

@@ -1,8 +1,6 @@
 // src/assets/styles/main.scss
 @use "./abstracts/variables" as *;
 @use "./layout/grid" as *;
-@use "./vuetify/overrides" as *;
-@use "./utilities/typography" as *;
 
 @use "./components/CharacterBarStat" as *;
 @use "./components/CharacterBarFight" as *;
@@ -10,8 +8,10 @@
 @use "./components/Countdown" as *;
 @use "./components/SelectedCharacters" as *;
 @use "./components/Character" as *;
+@use "./components/PlayerStats" as *;
 
-// Estilos globales adicionales
-body {
-	background-color: var(--v-background-base);
-}
+@use "./utilities/decoration" as *;
+@use "./utilities/typography" as *;
+@use "./utilities/animation" as *;
+
+@use "./vuetify/overrides" as *;

@@ -1,41 +1,49 @@
 <template>
   <div>
-    <div class="w-100 justify-center">
-      <v-btn :disabled="countdownStore.isCountdownActive" size="x-small" @click="assignRandomCharacter(0)">RND</v-btn>
-
-      <v-tooltip v-if="selectedCharacters[0]" location="top">
-        <template v-slot:activator="{ props }">
-          <v-avatar size="50" @click="toggleSelection(selectedCharacters[0])" v-bind="props"
-            class="hb-avatar-container">
-            <v-img :src="selectedCharacters[0].images.md" alt="Character Image" />
-            <v-icon v-if="!countdownStore.isCountdownActive && router.currentRoute.value.name !== 'Fight'"
-              class="hb-remove-icon mdi mdi-close" @click.stop="toggleSelection(selectedCharacters[0])" />
-          </v-avatar>
-        </template>
-        <span>{{ selectedCharacters[0] ? selectedCharacters[0].name : 'Empty Slot' }}</span>
-      </v-tooltip>
-      <v-avatar v-else color="#B0BEC5" size="50"></v-avatar>
-
-      <v-btn variant="outlined" class="mx-4" @click="goToCharactersFight"
-        :disabled="countdownStore.isCountdownActive || !canFight">
+    <div class="hb-selectedCharas w-100 justify-center d-flex justify-center align-center">
+      <div class="d-flex justify-center align-center">
+        <v-btn class="mr-1 mt-0" color="secondary" :disabled="countdownStore.isCountdownActive" size="x-small"
+          @click="assignRandomCharacter(0)">RND</v-btn>
+        <!-- Tooltip for selected character (Slot 1) -->
+        <v-tooltip v-if="selectedCharacters[0]" location="top">
+          <template v-slot:activator="{ props }">
+            <v-avatar :size="breakpoint.smAndDown ? '35' : '50'" @click="toggleSelection(selectedCharacters[0])"
+              v-bind="props" class="hb-avatar-container mt-0">
+              <v-img :src="selectedCharacters[0].images.md" alt="Character Image" />
+              <v-icon v-if="!countdownStore.isCountdownActive && router.currentRoute.value.name !== 'Fight'"
+                class="hb-remove-icon mdi mdi-close" @click.stop="toggleSelection(selectedCharacters[0])" />
+            </v-avatar>
+          </template>
+          <span>{{ selectedCharacters[0] ? selectedCharacters[0].name : 'Empty Slot' }}</span>
+        </v-tooltip>
+        <v-avatar v-else color="#B0BEC5" :size="breakpoint.smAndDown ? '35' : '50'"
+          class="hb-avatar-container mt-0"></v-avatar>
+      </div>
+      <v-btn :size="breakpoint.smAndDown ? 'x-small' : 'default'"
+        :class="canFight && router.currentRoute.value.name !== 'Fight' ? 'hb-btn--glow' : ''" color="secondary"
+        variant="outlined" class="mx-4" @click="goToCharactersFight"
+        :disabled="countdownStore.isCountdownActive || !canFight || router.currentRoute.value.name == 'Fight'">
         Start
       </v-btn>
 
-      <!-- Tooltip for selected character (Slot 2) -->
-      <v-tooltip v-if="selectedCharacters[1]" location="top">
-        <template v-slot:activator="{ props }">
-          <v-avatar size="50" @click="toggleSelection(selectedCharacters[1])" v-bind="props"
-            class="hb-avatar-container">
-            <v-img :src="selectedCharacters[1].images.md" alt="Character Image" />
-            <v-icon v-if="!countdownStore.isCountdownActive && router.currentRoute.value.name !== 'Fight'"
-              class="hb-remove-icon mdi mdi-close" @click.stop="toggleSelection(selectedCharacters[1])" />
-          </v-avatar>
-        </template>
-        <span>{{ selectedCharacters[1] ? selectedCharacters[1].name : 'Empty Slot' }}</span>
-      </v-tooltip>
-      <v-avatar v-else color="#B0BEC5" size="50"></v-avatar>
-
-      <v-btn :disabled="countdownStore.isCountdownActive" size="x-small" @click="assignRandomCharacter(1)">RND</v-btn>
+      <div class="d-flex justify-center align-center">
+        <!-- Tooltip for selected character (Slot 2) -->
+        <v-tooltip v-if="selectedCharacters[1]" location="top">
+          <template v-slot:activator="{ props }">
+            <v-avatar :size="breakpoint.smAndDown ? '35' : '50'" @click="toggleSelection(selectedCharacters[1])"
+              v-bind="props" class="hb-avatar-container mt-0">
+              <v-img :src="selectedCharacters[1].images.md" alt="Character Image" />
+              <v-icon v-if="!countdownStore.isCountdownActive && router.currentRoute.value.name !== 'Fight'"
+                class="hb-remove-icon mdi mdi-close" @click.stop="toggleSelection(selectedCharacters[1])" />
+            </v-avatar>
+          </template>
+          <span>{{ selectedCharacters[1] ? selectedCharacters[1].name : 'Empty Slot' }}</span>
+        </v-tooltip>
+        <v-avatar v-else color="#B0BEC5" :size="breakpoint.smAndDown ? '35' : '50'"
+          class="hb-avatar-container mt-4 mt-md-0"></v-avatar>
+        <v-btn class="ml-1 mt-0" color="secondary" :disabled="countdownStore.isCountdownActive" size="x-small"
+          @click="assignRandomCharacter(1)">RND</v-btn>
+      </div>
     </div>
   </div>
 </template>
@@ -46,6 +54,10 @@ import { useRouter } from 'vue-router';
 import { computed, ref, onMounted } from 'vue';
 import { getListCharacters } from "@/services/api"; // Import API
 import { CharacterModel } from '@/models/character.model';
+import { useDisplay } from 'vuetify'
+
+//Reactive variables
+const breakpoint = ref(useDisplay());
 
 // Pinia Stores
 import { useCountdownStore } from '@/stores/countdownStore';

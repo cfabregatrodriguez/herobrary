@@ -4,11 +4,15 @@ export const useCountdownStore = defineStore("countdown", {
 	// **State**: Define el estado de la tienda
 	state: () => ({
 		isCountdownActive: false,
+		isBattleActive: false,
 	}),
 
 	getters: {
 		countdownStatus(state) {
-			return state.isCountdownActive ? "Active" : "Inactive";
+			return state.isCountdownActive ? true : false;
+		},
+		battleStatus(state) {
+			return state.isBattleActive ? true : false;
 		},
 	},
 
@@ -20,6 +24,14 @@ export const useCountdownStore = defineStore("countdown", {
 
 		stopCountdown() {
 			this.isCountdownActive = false;
+		},
+
+		startBattle() {
+			this.isBattleActive = true;
+		},
+
+		stopBattle() {
+			this.isBattleActive = false;
 		},
 	},
 });

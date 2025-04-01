@@ -8,6 +8,10 @@
 // Vue & Utilities
 import { ref } from 'vue';
 
+// Pinia Stores
+import { useCountdownStore } from '@/stores/countdownStore';
+const countdownStore = useCountdownStore();  // Using countdown store
+
 // Props
 const props = defineProps({
   maxCount: { type: Number, default: 10 }
@@ -29,9 +33,10 @@ const startCounting = () => {
   interval = setInterval(() => {
     if (count.value > 0) {
       count.value--;
-    } else {
+    } else if (countdownStore.isBattleActive) {
       clearInterval(interval!);
-      emit("finished");
+      countdownStore.stopBattle();
+      emit("finished");  // Emitir el evento solo si el combate sigue activo
     }
   }, 1000);
 };

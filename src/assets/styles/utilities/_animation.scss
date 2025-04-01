@@ -1,0 +1,113 @@
+@use "../abstracts/variables" as *;
+
+// Vuetify transitions
+
+.fade-scale-enter-active,
+.fade-scale-leave-active {
+	transform-origin: center;
+	transition: transform 0.5s, opacity 1s;
+}
+
+.fade-scale-enter-from {
+	transform-origin: center;
+	transform: scale(100);
+	opacity: 0;
+}
+
+.fade-scale-leave-to {
+	transform-origin: center;
+	transform: scale(100);
+	opacity: 0;
+}
+
+.fade-opacity-enter-active,
+.fade-opacity-leave-active {
+	transition: opacity 1s ease;
+}
+
+.fade-opacity-enter-from {
+	opacity: 0;
+}
+
+.fade-opacity-leave-to {
+	opacity: 0;
+}
+
+// keyframes animations
+
+.#{$namespace}animation--slideLeft {
+	animation: slideLeft 0.5s cubic-bezier(0.5, -0.2, 0.3, 1.2);
+}
+
+.#{$namespace}animation--slideRight {
+	animation: slideRight 0.5s cubic-bezier(0.5, -0.2, 0.3, 1.2);
+}
+
+.#{$namespace}animation--slideTop {
+	animation: slideTop 1s cubic-bezier(0.5, -0.2, 0.3, 1.2);
+}
+
+.#{$namespace}animation--slideBottom {
+	animation: slideBottom 1s cubic-bezier(0.5, -0.2, 0.3, 1.2);
+}
+
+//keyframes
+
+@keyframes slideBottom {
+	from {
+		transform: translateY(50vw) rotate(-0deg);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0) rotate(-3deg);
+		opacity: 1;
+	}
+}
+
+@keyframes slideLeft {
+	from {
+		transform: translateX(-100vw);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(0);
+		opacity: 1;
+	}
+}
+
+@keyframes slideRight {
+	from {
+		transform: translateX(100vw);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(0);
+		opacity: 1;
+	}
+}
+
+@keyframes slideTop {
+	from {
+		opacity: 0;
+		transform: scale(0.1);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+@keyframes glow {
+	0% {
+		box-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
+		background-color: rgba(255, 255, 255, 0);
+	}
+	50% {
+		box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+		background-color: rgba(255, 255, 255, 0.4);
+	}
+	100% {
+		box-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
+		background-color: rgba(255, 255, 255, 0);
+	}
+}

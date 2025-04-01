@@ -1,0 +1,43 @@
+@use "../abstracts/variables" as *;
+
+.#{$namespace}fight {
+	&__backgroundBar {
+		position: absolute;
+		height: 400px;
+		margin: auto 0;
+		top: 200px;
+		width: 200vw;
+		left: -50vw;
+		background-color: rgba(var(--v-theme-primary), 1);
+		color: rgba(var(--v-theme-primary), 1);
+		pointer-events: none;
+		animation: slideBottom 1s cubic-bezier(0.5, -0.2, 0.3, 1.2);
+		transform: rotate(-3deg);
+	}
+}
+
+.#{$namespace}detail {
+	&__backgroundChar {
+		position: absolute;
+		content: "";
+		height: calc(100% - 32px);
+		width: 100vh;
+		margin: auto 0;
+		top: 0;
+		right: 0vw;
+		margin: 16px;
+		background-color: rgba(var(--v-theme-primary), 1);
+		color: rgba(var(--v-theme-primary), 1);
+		pointer-events: none;
+	}
+}
+
+.#{$namespace}image--splat {
+	position: absolute;
+	left: -75%;
+	top: -25%;
+	height: 1500px;
+	width: 1600px;
+	z-index: 0;
+	transform: rotate(90deg);
+}

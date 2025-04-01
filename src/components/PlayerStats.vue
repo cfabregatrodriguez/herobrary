@@ -2,62 +2,115 @@
   <div>
     <v-row class="align-center justify-center" no-gutters>
       <!-- Wins Chip -->
-      <v-chip prepend-icon="mdi-check-bold" class="ma-2" color="green">
-        {{ wins }} Wins
+      <v-chip v-show="breakpoint.mdAndUp" :size="breakpoint.smAndDown ? 'x-small' : 'small'" color="primary"
+        prepend-icon="mdi-check-bold" class="hb-chip hb-chip--wins ma-2">
+        {{ wins }} <span class="ml-1" v-show="!breakpoint.smAndDown">Wins</span>
       </v-chip>
 
       <!-- Losses Chip -->
-      <v-chip prepend-icon="mdi-close-thick" class="ma-2" color="red">
-        {{ loses }} Loses
+      <v-chip v-show="breakpoint.mdAndUp" :size="breakpoint.smAndDown ? 'x-small' : 'small'" color="primary"
+        prepend-icon="mdi-close-thick" class="hb-chip hb-chip--defeats ma-2">
+        {{ loses }} <span class="ml-1" v-show="!breakpoint.smAndDown">Loses</span>
       </v-chip>
 
-      <!-- Player Avatar -->
-      <v-avatar>
-        <v-icon>mdi-account-circle</v-icon>
-      </v-avatar>
+      <!-- Player Avatar and History Dropdown -->
+      <v-menu location="bottom">
+        <template v-slot:activator="{ props }">
+          <v-avatar v-bind="props">
+            <v-icon color="white">mdi-account-circle</v-icon>
+          </v-avatar>
+        </template>
 
-      <!-- Button to open the battle history dialog -->
-      <v-btn @click="dialog = true">
-        History
-      </v-btn>
+        <!-- Dropdown Menu -->
+        <v-list>
+          <v-list-item @click="historyDialog = true">
+            <v-list-item-title class="text-white">History</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="helpDialog = true">
+            <v-list-item-title class="text-white">Help</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
     </v-row>
 
-    <!-- Battle History Dialog -->
-    <v-dialog v-model="dialog" transition="dialog-bottom-transition" width="400" scrollable>
-      <v-toolbar>
-        <v-btn icon="mdi-close" @click="dialog = false"></v-btn>
-        <v-toolbar-title>History Battles</v-toolbar-title>
+
+    <!-- Help Dialog -->
+    <v-dialog v-model="helpDialog" transition="dialog-bottom-transition" max-width="500" opacity=".8">
+
+      <v-toolbar color="primary">
+        <v-toolbar-title>Instructions</v-toolbar-title>
+        <v-btn icon="mdi-close" @click="helpDialog = false"></v-btn>
       </v-toolbar>
-      <v-card>
+      <v-card color="white">
+        <v-card-text>
+          <v-list class="text-primary opacity-60">
+            <v-list-item>
+              <strong>Press the Fight button to begin the fight.</strong>
+            </v-list-item>
+            <v-list-item>
+              <p>If you are over an 🟧 orange zone (combat), tap <strong>the spacebar</strong> repeatedly to strike
+                hard.
+              </p>
+            </v-list-item>
+            <v-list-item>
+              <p>If you are over a 🟪 purple zone (power), hold <strong>the spacebar</strong> down as long as you can
+                to
+                unleash
+                your energy.</p>
+            </v-list-item>
+
+          </v-list>
+
+
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn text="Close" @click="helpDialog = false"></v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+
+    <!-- Battle History Dialog -->
+    <v-dialog v-model="historyDialog" transition="dialog-bottom-transition" width="400" opacity=".8" scrollable>
+      <v-toolbar color="primary">
+        <v-toolbar-title>History Battles</v-toolbar-title>
+        <v-btn icon="mdi-close" @click="historyDialog = false"></v-btn>
+      </v-toolbar>
+      <v-card color="white">
         <v-card-text>
           <v-list dense>
             <v-item-group v-if="battles.length">
-              <v-list-item v-for="(battle, index) in battles" :key="index">
-                <v-list-item-title class="text-caption mb-2">
-                  <strong>Battle {{ index + 1 }}</strong>
-                </v-list-item-title>
-                <v-list-item-subtitle>
-                  <v-row class="align-center">
-                    <v-col cols="5">
-                      <v-avatar size="30px">
-                        <img :src="battle.characterAvatar" alt="Character Avatar" />
-                      </v-avatar>
-                      vs
-                      <v-avatar size="30px">
-                        <img :src="battle.enemyCharacterAvatar" alt="Enemy Avatar" />
-                      </v-avatar>
-                    </v-col>
-                    <v-col cols="4">
-                      {{ Math.round(battle.playerEnergy) }} vs {{ Math.round(battle.enemyEnergy) }}
-                    </v-col>
-                    <v-col cols="2">
-                      <v-icon v-if="Math.round(battle.playerEnergy) > Math.round(battle.enemyEnergy)" color="green"
-                        icon="mdi-check-bold" size="large"></v-icon>
-                      <v-icon v-else color="red" icon="mdi-close-thick" size="large"></v-icon>
-                    </v-col>
-                  </v-row>
-                </v-list-item-subtitle>
-                <v-divider class="mt-2"></v-divider>
+              <v-list-item v-for="(battle, index) in battles" :key="index"
+                :class="(Math.round(battle.playerEnergy) < Math.round(battle.enemyEnergy)) ? 'opacity-40' : ''">
+                <template v-slot:default="props">
+                  <div v-bind="props">
+                    <div class="d-flex w-100">
+                      <v-row class="align-center justify-start v-row--no-gutters text-primary">
+                        <v-col cols="1"><strong>{{ index + 1 }}</strong></v-col>
+                        <v-col cols="4">
+                          <v-avatar size="30px">
+                            <img :src="battle.characterAvatar" alt="Character Avatar" />
+                          </v-avatar>
+                          vs
+                          <v-avatar size="30px">
+                            <img :src="battle.enemyCharacterAvatar" alt="Enemy Avatar" />
+                          </v-avatar>
+                        </v-col>
+                        <v-col cols="6" class="text-center">
+                          {{ Math.round(battle.playerEnergy) }} vs {{ Math.round(battle.enemyEnergy) }}
+                        </v-col>
+                        <v-col cols="1">
+                          <v-icon v-if="Math.round(battle.playerEnergy) > Math.round(battle.enemyEnergy)"
+                            icon="mdi-check-bold" size="large"></v-icon>
+                          <v-icon v-else icon="mdi-close-thick" size="large"></v-icon>
+                        </v-col>
+                      </v-row>
+                    </div>
+                    <v-divider class="mt-2"></v-divider>
+                  </div>
+                </template>
               </v-list-item>
             </v-item-group>
             <v-list-item v-else>
@@ -65,9 +118,9 @@
             </v-list-item>
           </v-list>
         </v-card-text>
-        <v-card-actions>
-          <v-btn color="blue" text @click="dialog = false">Close</v-btn>
-          <v-btn color="red" text @click="clearBattles">Clear Battles</v-btn>
+        <v-card-actions class="py-4">
+          <v-btn color="primary" variant="flat" @click="clearBattles">Clear Battles</v-btn>
+          <v-btn color="primary" @click="historyDialog = false">Close</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -77,13 +130,16 @@
 <script setup lang="ts">
 // Vue & Utilities
 import { ref, computed, watch } from 'vue';
-import { useStatsPlayerStore } from '@/stores/statsPlayerStore';
-import { getCharacter } from '@/services/api';
+import { useDisplay } from 'vuetify'
 
 // State: Reactive variables
 const dialog = ref(false);
+const historyDialog = ref(false);
+const helpDialog = ref(false);
+const breakpoint = ref(useDisplay());
 
 // Pinia Stores
+import { useStatsPlayerStore } from '@/stores/statsPlayerStore';
 const statsPlayerStore = useStatsPlayerStore();
 
 // Computed

@@ -3,7 +3,7 @@
         <div class="d-sm-flex" :style="index == 1 ? { flexDirection: 'row-reverse' } : { flexDirection: 'row' }">
             <!-- Character card component -->
             <CharacterCard :character="character" :characterNum="1" :index="index" :isCharacterStats="isCharacterStats"
-                :isCharacterPublisher="isCharacterPublisher" :compact="compact" />
+                :isCharacterPublisher="isCharacterPublisher" :compact="compact" :winLose="winLose" />
 
             <!-- Character power bar (conditionally rendered) -->
             <CharacterPowerBar v-if="isCharacterPowerBar" :character="character" @divisionPassed="handleDivisionPassed"
@@ -33,48 +33,17 @@ const countdownStore = useCountdownStore();  // Using countdown store
 
 // Props
 const props = defineProps({
-    character: {
-        type: Object as () => CharacterModel,
-        required: true,
-        default: () => ({} as CharacterModel), // Provide a default value with type assertion
-    },
-    counter: {
-        type: Number,
-        default: 0
-    },
-    isAuto: {
-        type: Boolean,
-        default: false
-    },
-    isCharacterPowerBar: {
-        type: Boolean,
-        default: false
-    },
-    isCharacterBarFight: {
-        type: Boolean,
-        default: true
-    },
-    isCharacterStats: {
-        type: Boolean,
-        default: true
-    },
-    isCharacterPublisher: {
-        type: Boolean,
-        default: true
-    },
-    compact: {
-        type: Boolean,
-        default: false
-    },
-    bgColor: {
-        type: String,
-        default: "#FFFFFF"
-    },
-    index: {
-        type: Number,
-        required: true,
-        default: 0
-    }
+    character: { type: Object as () => CharacterModel, required: true, default: () => ({} as CharacterModel) },
+    counter: { type: Number, default: 0 },
+    isAuto: { type: Boolean, default: false },
+    isCharacterPowerBar: { type: Boolean, default: false },
+    isCharacterBarFight: { type: Boolean, default: true },
+    isCharacterStats: { type: Boolean, default: true },
+    isCharacterPublisher: { type: Boolean, default: true },
+    compact: { type: Boolean, default: false },
+    bgColor: { type: String, default: "#FFFFFF" },
+    index: { type: Number, required: true, default: 0 },
+    winLose: { type: Number, default: -1 }
 });
 
 // Emits

@@ -1,12 +1,22 @@
 @use "../abstracts/variables" as *;
 
 .#{$namespace}character {
-	border-radius: 12px;
+	border-radius: 0;
 	overflow: hidden;
 	position: relative;
-	box-shadow: 0 0px 20px rgba(0, 0, 0, 0.5);
+	&:before {
+		border-color: transparent #fff transparent transparent;
+		border-style: solid;
+		border-width: 24px 24px 0 0;
+		bottom: 0;
+		content: "";
+		position: absolute;
+		right: 0;
+		top: auto;
+		z-index: 1;
+	}
 	&--0 {
-		animation: slideLeft 0.5s cubic-bezier(0.5, -0.2, 0.3, 1.2); /* Rebote más sutil */
+		animation: slideLeft 0.5s cubic-bezier(0.5, -0.2, 0.3, 1.2);
 		&:after {
 			background: linear-gradient(
 				to top left,
@@ -17,7 +27,7 @@
 		}
 	}
 	&--1 {
-		animation: slideRight 0.5s cubic-bezier(0.5, -0.2, 0.3, 1.2); /* Rebote más sutil */
+		animation: slideRight 0.5s cubic-bezier(0.5, -0.2, 0.3, 1.2);
 		&:after {
 			background: linear-gradient(
 				to top right,
@@ -28,11 +38,9 @@
 		}
 	}
 	&--compact {
-		box-shadow: none;
-		border-radius: 0;
 		.#{$namespace}card {
-			&::after {
-				border-color: transparent #fff transparent transparent;
+			&:before {
+				border-color: transparent white transparent transparent;
 				border-style: solid;
 				border-width: 12px 12px 0 0;
 				bottom: 0;
@@ -40,41 +48,108 @@
 				position: absolute;
 				right: 0;
 				top: auto;
-				z-index: 40;
+				z-index: 1;
 			}
 		}
 	}
-	&:after {
-		pointer-events: none;
-		content: "";
+	.v-img__img--cover {
+		object-position: 0 20%;
+	}
+}
+
+.#{$namespace}card {
+	&__result {
+		color: white;
+		font-size: 48px;
 		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
-		z-index: 9;
+		top: 50%;
+		left: 50%;
+		background-color: rgba(var(--v-theme-primary), 0.9);
+		width: 200%;
+		height: auto;
+		transform: translate(-50%, -50%);
+		&__text {
+			transform-origin: center;
+		}
 	}
 }
 
-@keyframes slideLeft {
-	from {
-		transform: translateX(-100vw);
-		opacity: 0;
+.#{$namespace}card__badge {
+	z-index: 9;
+	position: absolute;
+	margin: 0;
+	background-color: rgba(var(--v-theme-primary), 1);
+	overflow: visible;
+	height: 20px;
+	&--left {
+		top: 0px;
+		left: 0px;
+		::after {
+			content: "";
+			position: absolute;
+			right: -88%;
+			width: 25px;
+			height: 20px;
+			background-color: transparent;
+			border-color: rgba(var(--v-theme-primary), 1) transparent transparent
+				transparent;
+			border-style: solid;
+			border-width: 20px 20px 0 0;
+		}
 	}
-	to {
-		transform: translateX(0);
-		opacity: 1;
+	&--right {
+		top: 0px;
+		right: 0px;
+		::after {
+			content: "";
+			position: absolute;
+			right: 110%;
+			width: 25px;
+			height: 20px;
+			background-color: transparent;
+			border-color: rgba(var(--v-theme-primary), 1) transparent transparent
+				transparent;
+			border-style: solid;
+			border-width: 20px 0 0 20px;
+		}
 	}
-}
-
-@keyframes slideRight {
-	from {
-		transform: translateX(100vw);
-		opacity: 0;
+	&--bottom {
+		bottom: 0px;
+		right: 50%;
+		transform: translateX(50%);
+		background-color: rgba(var(--v-theme-accent), 1);
+		.v-badge__badge {
+			padding: 2px 4px;
+		}
+		::after {
+			content: "";
+			position: absolute;
+			right: calc(100% + 4px);
+			top: 0;
+			width: 25px;
+			height: 20px;
+			background-color: transparent;
+			border-color: transparent rgba(var(--v-theme-accent), 1) transparent
+				transparent;
+			border-style: solid;
+			border-width: 25px 20px 0 0;
+		}
+		::before {
+			content: "";
+			position: absolute;
+			left: calc(100% + 4px);
+			top: 0;
+			width: 25px;
+			height: 20px;
+			background-color: transparent;
+			border-color: transparent transparent transparent
+				rgba(var(--v-theme-accent), 1);
+			border-style: solid;
+			border-width: 20px 0 0 20px;
+		}
 	}
-	to {
-		transform: translateX(0);
-		opacity: 1;
+	.v-badge__badge {
+		background-color: transparent;
+		color: white;
 	}
 }

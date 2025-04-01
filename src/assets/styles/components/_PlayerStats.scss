@@ -1,0 +1,8 @@
+@use "../abstracts/variables" as *;
+
+.#{$namespace}chip {
+	background-color: #fff;
+	.v-chip__content {
+		color: rgba(var(--v-theme-primary), 1);
+	}
+}

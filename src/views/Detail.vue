@@ -1,61 +1,42 @@
 <template>
-  <v-row v-if="character">
-    <v-col cols="4">
-      <v-container>
-        <Character v-if="character" :character="character" :index="1" :isCharacterPowerBar="false" />
+  <v-row v-if="character" class="text-left align-start justify-start align-md-center justify-md-center">
+    <v-col cols="12" sm="6" md="4">
+      <v-container class="position-relative hb-animation--slideLeft">
+        <div class="hb-detail__backgroundChar"></div>
+        <Character v-if="character" :character="character" :index="0" :isCharacterPowerBar="false" />
       </v-container>
     </v-col>
     <v-col>
       <v-row>
         <!-- Character biography details -->
-        <v-col>
-          <v-list>
-            <v-list-item class="text-left" :title="'Full Name'"
-              :subtitle="character.biography.fullName || 'Unknown'"></v-list-item>
-            <v-list-item class="text-left" :title="'Alter Egos'"
-              :subtitle="character.biography.alterEgos"></v-list-item>
-            <v-list-item class="text-left" :title="'Aliases'"
-              :subtitle="character.biography.aliases.join(', ')"></v-list-item>
-            <v-list-item class="text-left" :title="'Place of Birth'"
-              :subtitle="character.biography.placeOfBirth || 'Unknown'"></v-list-item>
-            <v-list-item class="text-left" :title="'Alignment'" :subtitle="character.biography.alignment"></v-list-item>
-          </v-list>
+        <v-col cols="12" sm="12" md="4" v-for="(value, title) in character.biography" :key="title">
+          <div class="mb-4">
+            <div class="text-caption font-weight-bold">{{ title }}</div>
+            <div class="opacity-50 text-subtitle-2">{{ value || 'Unknown' }}</div>
+          </div>
         </v-col>
 
         <!-- Character appearance details -->
-        <v-col>
-          <v-list>
-            <v-list-item class="text-left" :title="'Gender'" :subtitle="character.appearance.gender"></v-list-item>
-            <v-list-item class="text-left" :title="'Race'"
-              :subtitle="character.appearance.race || 'Unknown'"></v-list-item>
-            <v-list-item class="text-left" :title="'Height'"
-              :subtitle="character.appearance.height.join(' / ')"></v-list-item>
-            <v-list-item class="text-left" :title="'Weight'"
-              :subtitle="character.appearance.weight.join(' / ')"></v-list-item>
-            <v-list-item class="text-left" :title="'Eye Color'" :subtitle="character.appearance.eyeColor"></v-list-item>
-            <v-list-item class="text-left" :title="'Hair Color'"
-              :subtitle="character.appearance.hairColor"></v-list-item>
-            <v-divider></v-divider>
-
-            <v-list-item class="text-left" :title="'First Appearance'"
-              :subtitle="character.biography.firstAppearance"></v-list-item>
-            <v-list-item class="text-left" :title="'Publisher'" :subtitle="character.biography.publisher"></v-list-item>
-          </v-list>
+        <v-col cols="12" sm="12" md="4" v-for="(value, title) in character.appearance" :key="title">
+          <div class="mb-4">
+            <div class="text-caption font-weight-bold">{{ title }}</div>
+            <div class="opacity-50 text-subtitle-2">{{ value || 'Unknown' }}</div>
+          </div>
         </v-col>
 
         <!-- Character work and connections details -->
-        <v-col>
-          <v-list>
-            <v-list-item class="text-left" :title="'Occupation'" :subtitle="character.work.occupation"></v-list-item>
-            <v-list-item class="text-left" :title="'Base'" :subtitle="character.work.base"></v-list-item>
+        <v-col cols="12" sm="12" md="4" v-for="(value, title) in character.work" :key="title">
+          <div class="mb-4">
+            <div class="text-caption font-weight-bold">{{ title }}</div>
+            <div class="opacity-50 text-subtitle-2">{{ value || 'Unknown' }}</div>
+          </div>
+        </v-col>
 
-            <v-divider></v-divider>
-
-            <v-list-item class="text-left" :title="'Group Affiliation'"
-              :subtitle="character.connections.groupAffiliation"></v-list-item>
-            <v-list-item class="text-left" :title="'Relatives'"
-              :subtitle="character.connections.relatives"></v-list-item>
-          </v-list>
+        <v-col cols="12" sm="12" md="4" v-for="(value, title) in character.connections" :key="title">
+          <div class="mb-4">
+            <div class="text-caption font-weight-bold">{{ title }}</div>
+            <div class="opacity-50 text-subtitle-2">{{ value || 'Unknown' }}</div>
+          </div>
         </v-col>
       </v-row>
     </v-col>

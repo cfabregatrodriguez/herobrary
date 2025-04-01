@@ -1,22 +1,24 @@
 <template>
   <v-app>
+    <v-img class="hb-image--splat" :src="splat" alt="splat" />
     <!-- App Bar with Navigation and Components -->
-    <v-app-bar app fixed>
+    <v-app-bar app fixed class="hb-app-bar">
       <v-row no-gutters class="align-center justify-center">
         <!-- Button to navigate to the Character List page -->
-        <v-col cols="3">
-          <v-btn @click="$router.push({ name: 'List' })">
-            Characters
-          </v-btn>
+        <v-col cols="2" md="3">
+          <router-link to="/">
+            <v-img height=" 50px" :src="logo" alt="logo herobrary" />
+          </router-link>
         </v-col>
 
+
         <!-- Component to display selected characters -->
-        <v-col cols="6">
+        <v-col cols="8" md="4">
           <SelectedCharacters />
         </v-col>
 
         <!-- Component to display player stats -->
-        <v-col cols="3">
+        <v-col cols="2" md="3">
           <PlayerStats />
         </v-col>
       </v-row>
@@ -24,23 +26,21 @@
 
     <!-- Main content area -->
     <v-main>
-      <!-- Title with clickable link to homepage -->
-      <router-link to="/">
-        <h1 class="hb-title permanent-marker-regular">HEROBRARY</h1>
-      </router-link>
 
       <!-- Main content view where nested routes will be rendered -->
-      <div class="px-16 pb-16 pt-16">
+      <div class="py-16">
         <router-view></router-view>
       </div>
     </v-main>
+
   </v-app>
 </template>
 
 <script setup lang="ts">
+
 // Pinia Store: Player Stats
-import { useStatsPlayerStore } from "@/stores/statsPlayerStore";
-const statsPlayerStore = useStatsPlayerStore();
+import logo from '@/assets/images/logo.webp';
+import splat from '@/assets/images/splat.svg';
 
 // Components
 import SelectedCharacters from "@/components/SelectedCharacters.vue";
