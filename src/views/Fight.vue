@@ -1,35 +1,37 @@
 <template>
     <div>
-        <div class="hb-fight__backgroundBar" :style="breakpoint.smAndDown ? 'height: 100%' : ''">
+        <div class="hb-fight__backgroundBar" :style="breakpoint.xs ? 'height: 100%' : ''">
         </div>
         <v-row class="flex-column flex-sm-row justify-center align-center">
             <!-- Countdown timer -->
             <!-- Character 1 -->
-            <v-col cols="12" sm="5" class="pt-0 pr-0">
-                <Character v-if="character" :character="selectedCharactersStore.getCharacterByIndex(0)"
-                    :counter="counter" :bgColor="bgColor" :isAuto="false" @divisionPassed="handleDivisionPassed"
-                    @counterChange="handleCounterChange" @filled="endBattle" :index="0" :isCharacterPowerBar="true"
-                    :winLose="winLose" />
+            <v-col cols="12" sm="6" class="pt-0 pr-0">
+                <Character v-if="character" :mode="'fight'" class="hb-character--fight--0"
+                    :character="selectedCharactersStore.getCharacterByIndex(0)" :counter="counter" :bgColor="bgColor"
+                    :isAuto="true" @divisionPassed="handleDivisionPassed" @counterChange="handleCounterChange"
+                    @filled="endBattle" :index="0" :isCharacterPowerBar="true" :winLose="winLose" />
             </v-col>
-            <!-- Fight control and instructions -->
-            <v-col cols="2" class="d-flex align-center justify-center">
-                <div class="d-block">
-                    <!-- Button to start the fight -->
-                    <v-btn color="secondary" variant="outlined" v-show="!countdownStore.isCountdownActive"
-                        class="hb-btn--fight my-10 hb-btn--glow permanent-marker-regular" @click="toggleFight" icon=""
-                        :width="breakpoint.smAndDown ? '100' : '150'"
-                        :height="breakpoint.smAndDown ? '100' : '150'">Fight</v-btn>
+            <v-col cols="1">
+                <!-- Fight control and instructions -->
+                <div class="d-flex align-center justify-center hb-countdown-fight ml-n11">
+                    <div v-if="showFightButton" class="d-block hb-countdown-fight--in my-6">
+                        <!-- Button to start the fight -->
+                        <v-btn color="secondary" variant="outlined"
+                            class="hb-btn--fight hb-animation--glow permanent-marker-regular" @click="toggleFight"
+                            icon="" width="100" height="100">
+                            Fight
+                        </v-btn>
+                    </div>
+                    <Countdown v-show="countdownStore.isCountdownActive" ref="countdownRef" :maxCount="20"
+                        @finished="endBattle" />
                 </div>
-                <Countdown v-show="countdownStore.isCountdownActive" class="mb-8" ref="countdownRef" :maxCount="20"
-                    @finished="endBattle" />
             </v-col>
-
             <!-- Character 2 -->
             <v-col cols="12" sm="5" class="pt-0 pr-0">
-                <Character v-if="character2" :character="selectedCharactersStore.getCharacterByIndex(1)"
-                    :counter="counter2" :bgColor="bgColor2" :isAuto="true" @divisionPassed="handleDivisionPassed2"
-                    @counterChange="handleCounterChange2" @filled="endBattle" :index="1" :isCharacterPowerBar="true"
-                    :winLose="winLose" />
+                <Character v-if="character2" :mode="'fight'" class="hb-character--fight--1"
+                    :character="selectedCharactersStore.getCharacterByIndex(1)" :counter="counter2" :bgColor="bgColor2"
+                    :isAuto="true" @divisionPassed="handleDivisionPassed2" @counterChange="handleCounterChange2"
+                    @filled="endBattle" :index="1" :isCharacterPowerBar="true" :winLose="winLose" />
             </v-col>
         </v-row>
     </div>
@@ -37,7 +39,7 @@
 
 <script setup lang="ts">
 // Vue & Utilities
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, onUnmounted } from "vue";
 import { getCharacter } from "@/services/api";
 import { useDisplay } from 'vuetify'
 
@@ -57,6 +59,8 @@ const selectedCharactersStore = useSelectedCharactersStore();
 import Character from '@/components/Character.vue';
 import Countdown from "@/components/Countdown.vue";
 
+// Props
+
 // Reactive Variables
 const counter = ref(0);
 const counter2 = ref(0);
@@ -68,6 +72,7 @@ const bgColor2 = ref('red');
 const totalBarsPassed = ref(0);
 const winLose = ref(-1);
 const breakpoint = ref(useDisplay());
+const showFightButton = ref(true);
 
 
 // Actions
@@ -130,6 +135,14 @@ const endBattle = () => {
     }
 };
 
+const handleKeyPress = (event: KeyboardEvent) => {
+
+    if (event.code === "Space" && showFightButton.value) {
+        event.preventDefault(); // Evita el desplazamiento de la página al presionar espacio
+        toggleFight();
+    }
+};
+
 
 // Watchers
 watch(
@@ -140,6 +153,18 @@ watch(
     { deep: true } // Asegura que se detecten los cambios en los objetos internos
 );
 
+
+watch(() => countdownStore.isCountdownActive, (newValue) => {
+    if (!newValue) {
+        setTimeout(() => {
+            showFightButton.value = true;
+            winLose.value = -1;
+        }, 3000); // Espera 3 segundos antes de mostrar el botón
+    } else {
+        showFightButton.value = false; // Oculta el botón cuando el contador está activo
+    }
+});
+
 onMounted(async () => {
     try {
         character.value = await getCharacter(selectedCharactersStore.getCharacterByIndex(0).id);
@@ -147,6 +172,7 @@ onMounted(async () => {
         console.error("Error fetching character 1:", error);
         character.value = {} as CharacterModel; // Prevent null
     }
+    window.addEventListener("keydown", handleKeyPress);
 
     try {
         character2.value = await getCharacter(selectedCharactersStore.getCharacterByIndex(1).id);
@@ -154,5 +180,10 @@ onMounted(async () => {
         console.error("Error fetching character 2:", error);
         character2.value = {} as CharacterModel; // Prevent null
     }
+
+});
+
+onUnmounted(() => {
+    window.removeEventListener("keydown", handleKeyPress);
 });
 </script>

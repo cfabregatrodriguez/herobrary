@@ -1,10 +1,11 @@
 <template>
-    <div class="hb-ball" ref="ballContainer">
-        <div class="hb-ball__counter permanent-marker-regular">
+    <div class="hb-power-bar" ref="powerBarContainer">
+        <div class="hb-power-bar__counter permanent-marker-regular">
             {{ Math.round(counter) }}
         </div>
         <div>
-            <svg viewBox="0 0 200 1000" class="wave" :style="{ filter: 'drop-shadow(0 0 15px ' + bgColor + ')' }">
+            <svg style="left: 5px; bottom: 5px" viewBox="50 0 135 1000" class="wave"
+                :style="{ filter: 'drop-shadow(0 -5px 5px ' + bgColor + ')' }">
                 <defs>
                     <filter id="waveFilter">
                         <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="5" result="turbulence">
@@ -16,13 +17,14 @@
                 </defs>
 
                 <!-- Container Bar -->
-                <rect filter="url(#waveFilter)" :y="1000 - (50 + (counter * 2))" :height="50 + (counter * 2)"
+
+                <rect filter="url(#waveFilter)" :y="1000 - (0 + (counter * 2))" :height="50 + (counter * 2)" x="0"
                     width="300" :fill="bgColor" />
 
                 <!-- Colored Bars - Divisions - -->
                 <g>
                     <template v-for="i in numDivisions" :key="i">
-                        <line x1="300" x2="140" :y1="getDivisionY(i) - 30" :y2="getDivisionY(i) - 30" stroke="#ffb74d"
+                        <line x1="300" x2="150" :y1="getDivisionY(i) + 40" :y2="getDivisionY(i) + 40" stroke="#ffb74d"
                             stroke-width="4" stroke-opacity="1" />
                     </template>
                 </g>
@@ -30,9 +32,9 @@
                 <!-- Animated Circle -->
                 <g>
                     <template v-for="(division, index) in numDivisions" :key="index">
-                        <circle fill="#fff" :cx="140" :cy="getDivisionY(division) - 30" :r="getRadius(division)"
+                        <circle fill="#fff" :cx="180" :cy="getDivisionY(division) + 40" :r="getRadius(division)"
                             class="ok-message"
-                            :style="{ opacity: getOpacity(division), transition: 'opacity 1s, r 0.5s' }" />
+                            :style="[{ opacity: getOpacity(division), transition: 'opacity 1s, r 0.5s' }, { zIndex: '9999' }]" />
                     </template>
                 </g>
             </svg>
@@ -42,7 +44,7 @@
 
 <script setup lang="ts">
 // Vue & Utilities
-import { ref, watch, computed } from "vue";
+import { ref, watch, computed, onMounted } from "vue";
 
 // Props
 const props = defineProps({
@@ -72,7 +74,7 @@ const emit = defineEmits<{
 
 // Reactive Variables
 
-const ballContainer = ref<HTMLElement | null>(null);
+const powerBarContainer = ref<HTMLElement | null>(null);
 const passedDivisions = ref<number[]>([]);
 const messages = ref<{ [key: number]: boolean }>({});
 
@@ -118,10 +120,16 @@ function getDivisionY(i: number) {
 }
 
 function getRadius(division: number): number {
-    return messages.value[division] ? 15 : 0;
+    return messages.value[division] ? 100 : 0;
 }
 
 function getOpacity(division: number): number {
     return messages.value[division] ? 1 : 0;
 }
+
+// Lifecycle Hooks
+onMounted(() => {
+    passedDivisions.value = [];
+});
+
 </script>

@@ -22,4 +22,7 @@
 			filter: brightness(2);
 		}
 	}
+	&__colored-zones {
+		transition: all 0.1s;
+	}
 }

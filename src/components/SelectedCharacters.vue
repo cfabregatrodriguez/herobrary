@@ -5,7 +5,7 @@
         <v-btn class="mr-1 mt-0" color="secondary" :disabled="countdownStore.isCountdownActive" size="x-small"
           @click="assignRandomCharacter(0)">RND</v-btn>
         <!-- Tooltip for selected character (Slot 1) -->
-        <v-tooltip v-if="selectedCharacters[0]" location="top">
+        <v-tooltip v-if="selectedCharacters[0]" location="bottom" class="text-center">
           <template v-slot:activator="{ props }">
             <v-avatar :size="breakpoint.smAndDown ? '35' : '50'" @click="toggleSelection(selectedCharacters[0])"
               v-bind="props" class="hb-avatar-container mt-0">
@@ -14,13 +14,16 @@
                 class="hb-remove-icon mdi mdi-close" @click.stop="toggleSelection(selectedCharacters[0])" />
             </v-avatar>
           </template>
-          <span>{{ selectedCharacters[0] ? selectedCharacters[0].name : 'Empty Slot' }}</span>
+          <div v-if="!countdownStore.isCountdownActive && router.currentRoute.value.name !== 'Fight'">Remove
+          </div>
+          <span>{{
+            selectedCharacters[0] ? selectedCharacters[0].name : 'Empty Slot' }}</span>
         </v-tooltip>
         <v-avatar v-else color="#B0BEC5" :size="breakpoint.smAndDown ? '35' : '50'"
           class="hb-avatar-container mt-0"></v-avatar>
       </div>
       <v-btn :size="breakpoint.smAndDown ? 'x-small' : 'default'"
-        :class="canFight && router.currentRoute.value.name !== 'Fight' ? 'hb-btn--glow' : ''" color="secondary"
+        :class="canFight && router.currentRoute.value.name !== 'Fight' ? 'hb-animation--glow' : ''" color="secondary"
         variant="outlined" class="mx-4" @click="goToCharactersFight"
         :disabled="countdownStore.isCountdownActive || !canFight || router.currentRoute.value.name == 'Fight'">
         Start
@@ -28,7 +31,7 @@
 
       <div class="d-flex justify-center align-center">
         <!-- Tooltip for selected character (Slot 2) -->
-        <v-tooltip v-if="selectedCharacters[1]" location="top">
+        <v-tooltip v-if="selectedCharacters[1]" location="bottom" class="text-center">
           <template v-slot:activator="{ props }">
             <v-avatar :size="breakpoint.smAndDown ? '35' : '50'" @click="toggleSelection(selectedCharacters[1])"
               v-bind="props" class="hb-avatar-container mt-0">
@@ -37,6 +40,8 @@
                 class="hb-remove-icon mdi mdi-close" @click.stop="toggleSelection(selectedCharacters[1])" />
             </v-avatar>
           </template>
+          <div v-if="!countdownStore.isCountdownActive && router.currentRoute.value.name !== 'Fight'">Remove
+          </div>
           <span>{{ selectedCharacters[1] ? selectedCharacters[1].name : 'Empty Slot' }}</span>
         </v-tooltip>
         <v-avatar v-else color="#B0BEC5" :size="breakpoint.smAndDown ? '35' : '50'"

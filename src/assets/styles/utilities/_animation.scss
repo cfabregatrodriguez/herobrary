@@ -48,18 +48,49 @@
 }
 
 .#{$namespace}animation--slideBottom {
-	animation: slideBottom 1s cubic-bezier(0.5, -0.2, 0.3, 1.2);
+	transform-origin: center;
+	animation: slideBottom 0.5s;
+}
+
+.#{$namespace}animation--slideBottomRotate {
+	animation: slideBottomRotate 1s cubic-bezier(0.5, -0.2, 0.3, 1.2);
+}
+
+.#{$namespace}animation--opacityUp {
+	animation: opacityUp 1s cubic-bezier(0.5, -0.2, 0.3, 1.2);
+}
+
+.#{$namespace}animation--glow {
+	animation: glow 1.5s ease-in-out infinite;
 }
 
 //keyframes
 
-@keyframes slideBottom {
+@keyframes slideBottomRotate {
 	from {
 		transform: translateY(50vw) rotate(-0deg);
 		opacity: 0;
 	}
 	to {
 		transform: translateY(0) rotate(-3deg);
+		opacity: 1;
+	}
+}
+
+@keyframes slideBottom {
+	from {
+		transform: translateY(20px);
+	}
+	to {
+		transform: translateY(0);
+	}
+}
+
+@keyframes opacityUp {
+	from {
+		opacity: 0;
+	}
+	to {
 		opacity: 1;
 	}
 }
@@ -82,6 +113,39 @@
 	}
 	to {
 		transform: translateX(0);
+		opacity: 1;
+	}
+}
+
+@keyframes slideBackgroundBar {
+	from {
+		transform: translateX(-500vw) perspective(1000px) rotateY(90deg);
+	}
+	to {
+		transform: translateX(0vw) perspective(300px) rotateY(10deg);
+	}
+}
+
+@keyframes slideLeftPerspective {
+	from {
+		transform: translateX(-100vw) perspective(50px) rotateY(0deg);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(0) perspective(500px) rotateY(10deg);
+		opacity: 1;
+	}
+}
+
+@keyframes slideRightPerspective {
+	from {
+		transform: translateX(100vw) scale(1) scaleY(1) perspective(50px)
+			rotateY(-10deg);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(-60px) scale(0.95) scaleY(0.8) perspective(500px)
+			rotateY(-10deg);
 		opacity: 1;
 	}
 }

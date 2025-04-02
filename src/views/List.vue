@@ -26,7 +26,7 @@
 
     <!-- Character List -->
     <v-row>
-      <v-col v-for="character in paginatedCharacters" :key="character.id" cols="6" sm="4" md="2" class="pa-1">
+      <v-col v-for="character in paginatedCharacters" :key="character.id" cols="6" sm="4" md="3" lg="2" class="pa-1">
         <Character v-if="character" :character="character" :isCharacterPowerBar="false" :isCharacterStats="false"
           :isCharacterBarFight="false" :isCharacterPublisher="false" :compact="true" :index="1" />
       </v-col>

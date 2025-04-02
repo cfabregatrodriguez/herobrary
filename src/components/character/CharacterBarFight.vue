@@ -4,7 +4,7 @@
       <v-progress-linear ref="progressBarRef" class="position-relative" style="width: 100%; height: 20px;">
         <!-- Zonas de color -->
         <template v-for="(zone, index) in coloredZones" :key="index">
-          <div class="position-absolute" :style="{
+          <div class="hb-barfight__colored-zones position-absolute" :style="{
             left: zone.start + 'px',
             width: zone.width + 'px',
             height: '30px',
@@ -18,7 +18,8 @@
           left: minibarPos + 'px',
           width: minibarWidth + 'px',
           height: '100%',
-        }" :class="(isHolding || isAutoClick) && isCountdownActive ? 'hb-barfight__minibar--hit' : ''"></div>
+        }" :class="(isHolding || isAutoClick) && countdownStore.isCountdownActive ? 'hb-barfight__minibar--hit' : ''">
+        </div>
       </v-progress-linear>
 
     </div>
@@ -30,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, nextTick } from "vue";
+import { ref, computed, onMounted, onUnmounted, nextTick, watch } from "vue";
 import { VProgressLinear } from 'vuetify/components';
 
 // Props
@@ -38,28 +39,33 @@ const props = defineProps({
   character: { type: Object, required: false },
   bgColor: { type: String, default: "red" },
   isAuto: { type: Boolean, default: false },
-  isCountdownActive: { type: Boolean, default: false },
   counter: { type: Number, default: 1 },
+  divisionPassed: { type: Number, default: 1 }
 });
+
+import { useCountdownStore } from '@/stores/countdownStore';
+const countdownStore = useCountdownStore();  // Using countdown store
 
 const emit = defineEmits<{
   (event: "updateCounter", value: number): void;
 }>();
 
-// Refs comunes
+// Reactive variables
 const barWidth = ref(0);
 const maxTotalWidth = ref(0);
 const progressBarRef = ref<InstanceType<typeof VProgressLinear> | null>(null);
 const direction = ref(1);
 const minibarPos = ref(0);
+const divisionPassedRef = ref(props.divisionPassed);
 
-// Variable handicap
-const handicap = 1;
+
+// Variable handicap: cuanto mas baja mas dificil es llegar a cargar la barra (para todos)
+const handicap = 2;
 
 // Refs para jugador
 const baseHoldInterval = 50;
 const isHolding = ref(false);
-let interval: ReturnType<typeof setInterval>;
+let interval: ReturnType<typeof setInterval> | null = null;
 let holdTimer: ReturnType<typeof setInterval>;
 const holdTime = ref(0);
 
@@ -74,30 +80,30 @@ const autoBonusCounter = ref(1);
 // Functions
 
 // PowerZone
-function calculatePowerZone(power: number, maxWidth: number) {
+function calculatePowerZone(power: number, maxWidth: number, divisionPassed: number = 0) {
   return {
-    width: (power / 100) * (0.4 * maxWidth)
+    width: (power / 100) * (0.4 * maxWidth * (1 + (divisionPassed * 0.10)))
   };
 }
 
 // CombatZones
-function calculateCombatZones(combat: number, maxWidth: number) {
+function calculateCombatZones(combat: number, maxWidth: number, divisionPassed: number = 0) {
   const combatZones: { width: number }[] = [];
   if (combat <= 20) combatZones.push({ width: 0.1 * maxWidth });
-  else if (combat <= 50) combatZones.push({ width: 0.1 * maxWidth }, { width: 0.1 * maxWidth });
-  else if (combat <= 80) combatZones.push({ width: 0.2 * maxWidth });
-  else if (combat <= 90) combatZones.push({ width: 0.2 * maxWidth }, { width: 0.15 * maxWidth });
-  else if (combat <= 99) combatZones.push({ width: 0.25 * maxWidth }, { width: 0.15 * maxWidth });
-  else if (combat >= 100) combatZones.push({ width: 0.25 * maxWidth }, { width: 0.25 * maxWidth });
+  else if (combat <= 50) combatZones.push({ width: 0.10 * maxWidth }, { width: 0.10 * maxWidth });
+  else if (combat <= 80) combatZones.push({ width: 0.15 * maxWidth }, { width: 0.10 * maxWidth });
+  else if (combat <= 90) combatZones.push({ width: 0.15 * maxWidth }, { width: 0.15 * maxWidth });
+  else if (combat <= 99) combatZones.push({ width: 0.15 * maxWidth }, { width: 0.10 * maxWidth }, { width: 0.15 * maxWidth });
+  else if (combat >= 100) combatZones.push({ width: 0.15 * maxWidth }, { width: 0.20 * maxWidth }, { width: 0.10 * maxWidth });
 
   return combatZones;
 }
 
 // All zones
-function calculateZones(power: number, combat: number, maxWidth: number) {
-  const powerZone = { ...calculatePowerZone(power, maxWidth), type: 'power' };
-  const combatZones = calculateCombatZones(combat, maxWidth).map(z => ({ ...z, type: 'combat' }));
+function calculateZones(power: number, combat: number, maxWidth: number, divisionPassed: number = 0) {
 
+  const powerZone = { ...calculatePowerZone(power, maxWidth, divisionPassed), type: 'power' };
+  const combatZones = calculateCombatZones(combat, maxWidth, divisionPassed).map(z => ({ ...z, type: 'combat' }));
   // Intercalar las zonas
   const allZones: { width: number, type: string, start: number, color: string }[] = [];
   let i = 0;
@@ -159,7 +165,7 @@ const coloredZones = computed(() => {
   if (!props.character || maxTotalWidth.value <= 1) return [];
 
   const { combat, power } = props.character.powerstats;
-  return calculateZones(power, combat, maxTotalWidth.value);
+  return calculateZones(power, combat, maxTotalWidth.value, divisionPassedRef.value);
 });
 
 // Computed stats
@@ -176,12 +182,12 @@ const minibarWidth = computed(() => {
 
 const penalty = computed(() => {
   if (!props.character) return 4;
-  return (props.counter * ((15 - props.character.powerstats.durability / 10)) / 100);
+  return (props.counter * ((15 - props.character.powerstats.durability / 10)) / 100) * handicap;
 });
 
 const bonus = computed(() => {
   if (!props.character) return 1;
-  return (1 + props.character.powerstats.strength / 2.5) * handicap;
+  return (1 + props.character.powerstats.strength / 4) * handicap;
 });
 
 
@@ -272,7 +278,7 @@ const updateCounterValueAuto = () => {
   }
 
   // Calculate the final bonus based on whether we're in a combat zone
-  const bonusFinal = isInCombatZone.value ? bonus.value / 2 : autoBonusCounter.value;
+  const bonusFinal = isInCombatZone.value ? bonus.value / 2 : autoBonusCounter.value * handicap;
   let newValue = 0;
 
   // Calculate the precision based on the zone width and speed-modified hit chance
@@ -307,7 +313,7 @@ const updateCounterValueAuto = () => {
 
 
 const updateHold = () => {
-  if (!props.isCountdownActive) return;
+  if (!countdownStore.isCountdownActive) return;
   if (!isHolding.value) return;
 
   if (isInsideColoredZone.value) {
@@ -322,7 +328,7 @@ const updateHold = () => {
 };
 
 const startHold = () => {
-  if (!props.isCountdownActive || isHolding.value) return;
+  if (!countdownStore.isCountdownActive || isHolding.value) return;
 
   isHolding.value = true;
   holdTime.value = 0; // empezamos en 1 directamente
@@ -331,14 +337,14 @@ const startHold = () => {
 };
 
 const stopHold = () => {
-  if (!props.isCountdownActive) return;  // Detener solo si el countdown está activo
+  if (!countdownStore.isCountdownActive) return;  // Detener solo si el countdown está activo
   isHolding.value = false;
   clearInterval(holdTimer);
 };
 
 // Keyboard Events
 const handleKeyDown = (event: KeyboardEvent) => {
-  if (!props.isCountdownActive) return;  // Solo permite comenzar si el countdown está activo
+  if (!countdownStore.isCountdownActive) return;  // Solo permite comenzar si el countdown está activo
   if (event.code === "Space") {
     event.preventDefault();
     startHold();
@@ -346,25 +352,46 @@ const handleKeyDown = (event: KeyboardEvent) => {
 };
 
 const handleKeyUp = (event: KeyboardEvent) => {
-  if (!props.isCountdownActive) return;  // Solo permite detener si el countdown está activo
+  if (!countdownStore.isCountdownActive) return;  // Solo permite detener si el countdown está activo
   if (event.code === "Space") {
     event.preventDefault();
     stopHold();
   }
 };
 
+// Watchers
+
+// Observa cuando countdownStore.isCountdownActive cambia
+watch(() => countdownStore.isCountdownActive, (newValue) => {
+  if (newValue) {
+    nextTick(updateBarWidth);
+    divisionPassedRef.value = 0;
+    // Activa el intervalo cuando isCountdownActive es true
+    interval = setInterval(moveMinibar, 12);
+  } else {
+    // Limpia el intervalo cuando isCountdownActive es false
+    if (interval) {
+      clearInterval(interval);
+      interval = null;
+    }
+
+  }
+});
+
+watch(() => props.divisionPassed, (newValue) => {
+  divisionPassedRef.value = newValue;
+});
+
+
 // Lifecycle Hooks
 onMounted(() => {
   nextTick(updateBarWidth);
   nextTick(updateWidth);
   window.addEventListener("resize", updateBarWidth);
-
-  interval = setInterval(moveMinibar, 12);
-
   // Si está en modo auto, establece el intervalo para aumentar o reducir el contador
   if (props.isAuto) {
     intervalAutoClicks = setInterval(() => {
-      if (props.isCountdownActive) {
+      if (countdownStore.isCountdownActive) {
         updateCounterValueAuto();
       }
     }, baseHoldIntervalAuto);
@@ -378,9 +405,9 @@ onMounted(() => {
 
 // Limpiar los intervalos cuando el countdown termina
 onUnmounted(() => {
-  clearInterval(interval);
-  clearInterval(holdTimer);
-  clearInterval(intervalAutoClicks);
+  if (interval) clearInterval(interval);
+  if (holdTimer) clearInterval(holdTimer);
+  if (intervalAutoClicks) clearInterval(intervalAutoClicks);
   window.removeEventListener("resize", updateBarWidth);
   window.removeEventListener("keydown", handleKeyDown);
   window.removeEventListener("keyup", handleKeyUp);

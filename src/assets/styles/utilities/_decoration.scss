@@ -3,16 +3,16 @@
 .#{$namespace}fight {
 	&__backgroundBar {
 		position: absolute;
-		height: 400px;
+		height: 300px;
 		margin: auto 0;
-		top: 200px;
+		top: 190px;
 		width: 200vw;
 		left: -50vw;
 		background-color: rgba(var(--v-theme-primary), 1);
 		color: rgba(var(--v-theme-primary), 1);
 		pointer-events: none;
-		animation: slideBottom 1s cubic-bezier(0.5, -0.2, 0.3, 1.2);
-		transform: rotate(-3deg);
+		animation: slideBackgroundBar 1s cubic-bezier(0.5, -0.2, 0.3, 1.2);
+		transform: translateX(0vw) perspective(300px) rotateY(10deg);
 	}
 }
 

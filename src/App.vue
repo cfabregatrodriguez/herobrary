@@ -32,7 +32,6 @@
         <router-view></router-view>
       </div>
     </v-main>
-
   </v-app>
 </template>
 

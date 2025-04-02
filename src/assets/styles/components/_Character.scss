@@ -1,4 +1,6 @@
 @use "../abstracts/variables" as *;
+@use "sass:map";
+@use "vuetify/lib/styles/settings/variables" as *;
 
 .#{$namespace}character {
 	border-radius: 0;
@@ -16,7 +18,6 @@
 		z-index: 1;
 	}
 	&--0 {
-		animation: slideLeft 0.5s cubic-bezier(0.5, -0.2, 0.3, 1.2);
 		&:after {
 			background: linear-gradient(
 				to top left,
@@ -27,7 +28,6 @@
 		}
 	}
 	&--1 {
-		animation: slideRight 0.5s cubic-bezier(0.5, -0.2, 0.3, 1.2);
 		&:after {
 			background: linear-gradient(
 				to top right,
@@ -36,6 +36,17 @@
 				rgba(255, 255, 255, 1) 100%
 			);
 		}
+	}
+	&--fight--0 {
+		transform: perspective(500px) rotateY(10deg);
+		transform-origin: center;
+		animation: slideLeftPerspective 0.5s cubic-bezier(0.5, -0.2, 0.3, 1.2);
+	}
+	&--fight--1 {
+		transform: translateX(-60px) scale(0.95) scaleY(0.8) perspective(500px)
+			rotateY(-10deg);
+		transform-origin: center;
+		animation: slideRightPerspective 0.5s cubic-bezier(0.5, -0.2, 0.3, 1.2);
 	}
 	&--compact {
 		.#{$namespace}card {
@@ -58,6 +69,29 @@
 }
 
 .#{$namespace}card {
+	&--fight {
+		display: flex;
+		.#{$namespace}card__img {
+			width: 50%;
+		}
+		.#{$namespace}card__info {
+			width: 50%;
+			display: flex;
+			position: relative;
+			background-color: transparent;
+			flex-direction: column;
+			justify-content: space-between;
+		}
+		&--1 {
+			flex-direction: row-reverse;
+			.#{$namespace}character__stat {
+				flex-direction: row-reverse;
+				.v-col:first-child {
+					text-align: right !important;
+				}
+			}
+		}
+	}
 	&__result {
 		color: white;
 		font-size: 48px;
@@ -71,6 +105,21 @@
 		&__text {
 			transform-origin: center;
 		}
+	}
+
+	&--darken-on-hover {
+		img {
+			filter: brightness(0.4);
+		}
+	}
+
+	&__eye-icon {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		background-color: white;
+		color: rgba(var(--v-theme-primary), 1) !important;
 	}
 }
 
@@ -115,8 +164,7 @@
 	}
 	&--bottom {
 		bottom: 0px;
-		right: 50%;
-		transform: translateX(50%);
+		margin-left: calc(-25% + 20px);
 		background-color: rgba(var(--v-theme-accent), 1);
 		.v-badge__badge {
 			padding: 2px 4px;
@@ -148,8 +196,72 @@
 			border-width: 20px 0 0 20px;
 		}
 	}
+
 	.v-badge__badge {
 		background-color: transparent;
 		color: white;
+	}
+}
+
+.#{$namespace}overlay {
+	&::after {
+		width: 100%;
+		height: 100%;
+		pointer-events: none;
+		content: "";
+		background-color: #fff;
+		position: absolute;
+		top: 0;
+		left: 0;
+		z-index: 0;
+		opacity: 0.4;
+	}
+}
+
+@media #{map.get($display-breakpoints, 'xs')} {
+	.#{$namespace}card {
+		&--fight {
+			.#{$namespace}card__img {
+				width: 100%;
+			}
+			.#{$namespace}card__info {
+				width: 100%;
+				position: absolute;
+				bottom: 0;
+				background-color: rgba(var(--v-theme-primary), 0.7);
+				display: flex;
+				flex-direction: column;
+				justify-content: space-between;
+			}
+		}
+	}
+	.#{$namespace}character {
+		&:before {
+			content: initial;
+		}
+		&--0 {
+			transform: perspective(0) rotateY(0);
+		}
+		&--1 {
+			transform: scale(1) scaleY(0.8) perspective(0) rotateY(0);
+		}
+	}
+}
+
+@media #{map.get($display-breakpoints, 'md-and-up')} {
+	.#{$namespace}card {
+		&--fight {
+			.#{$namespace}card__img {
+				width: 50%;
+			}
+			.#{$namespace}card__info {
+				width: 50%;
+				display: flex;
+				position: relative;
+				background-color: transparent;
+				flex-direction: column;
+				justify-content: space-between;
+			}
+		}
 	}
 }

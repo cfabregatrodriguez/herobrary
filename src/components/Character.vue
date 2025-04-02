@@ -1,9 +1,10 @@
 <template>
-    <div :class="'hb-character hb-character--' + index + (compact ? ' hb-character--compact' : '')">
+    <div :class="['hb-character', `hb-character--${index}`, { 'hb-character--compact': compact }]">
         <div class="d-sm-flex" :style="index == 1 ? { flexDirection: 'row-reverse' } : { flexDirection: 'row' }">
             <!-- Character card component -->
-            <CharacterCard :character="character" :characterNum="1" :index="index" :isCharacterStats="isCharacterStats"
-                :isCharacterPublisher="isCharacterPublisher" :compact="compact" :winLose="winLose" />
+            <CharacterCard :character="character" :mode="mode" :characterNum="1" :index="index"
+                :isCharacterStats="isCharacterStats" :isCharacterPublisher="isCharacterPublisher" :compact="compact"
+                :winLose="winLose" />
 
             <!-- Character power bar (conditionally rendered) -->
             <CharacterPowerBar v-if="isCharacterPowerBar" :character="character" @divisionPassed="handleDivisionPassed"
@@ -13,13 +14,13 @@
 
         <!-- Character bar fight (conditionally rendered) -->
         <CharacterBarFight v-if="isCharacterBarFight" :character="character" :counter="counter" :bgColor="bgColor"
-            :isCountdownActive="countdownStore.isCountdownActive" :isAuto="isAuto"
-            @updateCounter="handleCounterChange" />
+            :isAuto="isAuto" @updateCounter="handleCounterChange" :divisionPassed="divisionPassed" />
     </div>
 </template>
 
 <script setup lang="ts">
 // Models
+import { watch, ref } from 'vue';
 import { CharacterModel } from '@/models/character.model';
 
 // Components
@@ -28,8 +29,6 @@ import CharacterPowerBar from '@/components/character/CharacterPowerBar.vue';
 import CharacterBarFight from '@/components/character/CharacterBarFight.vue';
 
 // Pinia Stores
-import { useCountdownStore } from '@/stores/countdownStore';
-const countdownStore = useCountdownStore();  // Using countdown store
 
 // Props
 const props = defineProps({
@@ -42,9 +41,13 @@ const props = defineProps({
     isCharacterPublisher: { type: Boolean, default: true },
     compact: { type: Boolean, default: false },
     bgColor: { type: String, default: "#FFFFFF" },
-    index: { type: Number, required: true, default: 0 },
-    winLose: { type: Number, default: -1 }
+    index: { type: Number, required: true },
+    winLose: { type: Number, default: -1 },
+    mode: { type: String, default: 'default' }
 });
+
+// Reactive variables
+const divisionPassed = ref(0);
 
 // Emits
 const emit = defineEmits<{
@@ -59,6 +62,7 @@ const handleFilled = () => {
 };
 
 const handleDivisionPassed = (division: number) => {
+    divisionPassed.value = division;
     emit('divisionPassed', division);
 };
 

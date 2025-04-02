@@ -45,7 +45,7 @@
         <v-card-text>
           <v-list class="text-primary opacity-60">
             <v-list-item>
-              <strong>Press the Fight button to begin the fight.</strong>
+              <strong>Press the Fight button or press <strong>the spacebar</strong> to begin the fight.</strong>
             </v-list-item>
             <v-list-item>
               <p>If you are over an 🟧 orange zone (combat), tap <strong>the spacebar</strong> repeatedly to strike

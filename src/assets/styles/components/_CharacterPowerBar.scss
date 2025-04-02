@@ -1,6 +1,6 @@
 @use "../abstracts/variables" as *;
 
-.#{$namespace}ball {
+.#{$namespace}power-bar {
 	pointer-events: none;
 	width: 100px;
 	overflow: hidden;
