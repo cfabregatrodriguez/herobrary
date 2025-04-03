@@ -1,6 +1,6 @@
 <template>
+  <v-img class="hb-image--splat" :src="splat" alt="splat" />
   <v-app>
-    <v-img class="hb-image--splat" :src="splat" alt="splat" />
     <!-- App Bar with Navigation and Components -->
     <v-app-bar app fixed class="hb-app-bar">
       <v-row no-gutters class="align-center justify-center">
@@ -19,7 +19,8 @@
 
         <!-- Component to display player stats -->
         <v-col cols="2" md="3">
-          <PlayerStats />
+          <PlayerStats v-model:helpDialog="helpDialog" v-model:historyDialog="historyDialog"
+            v-model:settingsDialog="settingsDialog" />
         </v-col>
       </v-row>
     </v-app-bar>
@@ -31,17 +32,30 @@
       <div class="py-16">
         <router-view></router-view>
       </div>
+      <Dialogs v-model:helpDialog="helpDialog" v-model:historyDialog="historyDialog"
+        v-model:settingsDialog="settingsDialog"></Dialogs>
     </v-main>
+    <v-bottom-navigation bg-color="transparent" elevation="0" class="justify-end">
+      <v-btn color="white" :icon="'mdi-help'" @click="helpDialog = true" flat></v-btn>
+    </v-bottom-navigation>
   </v-app>
 </template>
 
 <script setup lang="ts">
+  // Vue & Utilities
+  import { ref } from "vue";
 
-// Pinia Store: Player Stats
-import logo from '@/assets/images/logo.webp';
-import splat from '@/assets/images/splat.svg';
+  // Images
+  import logo from '@/assets/images/logo.webp';
+  import splat from '@/assets/images/splat.svg';
 
-// Components
-import SelectedCharacters from "@/components/SelectedCharacters.vue";
-import PlayerStats from "@/components/PlayerStats.vue";
+  // Components
+  import SelectedCharacters from "@/components/SelectedCharacters.vue";
+  import PlayerStats from "@/components/PlayerStats.vue";
+  import Dialogs from "@/components/Dialogs.vue"
+
+  // Variables
+  const helpDialog = ref(false);
+  const historyDialog = ref(false);
+  const settingsDialog = ref(false);
 </script>

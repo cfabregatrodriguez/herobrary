@@ -5,14 +5,23 @@
                 :class="[{ 'hb-card--fight': mode == 'fight' }, { 'hb-card--fight--0': index == 0 }, { 'hb-card--fight--1': index == 1 }]">
                 <div class="hb-card__img" @mouseover="isHovering = true" @mouseleave="isHovering = false">
                     <v-img :src="character.images?.lg || ''" alt="Character Image" cover
-                        :style="{ height: compact ? '300px' : '400px' }"
+                        @click.stop="isNotFightRoute ? toggleSelection() : ''"
+                        :style="{ height: compact ? '300px' : '400px' }" class="cursor-pointer"
                         :class="[{ 'hb-overlay': isSelected && isNotFightRoute }, { 'hb-card--darken-on-hover': isHovering && isListRoute }]">
+
                         <v-toolbar color="transparent">
                             <template v-slot:append>
                                 <v-badge :class="['hb-card__badge', badgePositionClass]" :content="getRank(character)"
                                     inline />
                             </template>
                         </v-toolbar>
+
+                        <v-tooltip
+                            v-if="!isSelected && selectedCharactersStore.checkIfArrayHasElementsInBothPositions()"
+                            activator="parent" width="200" location="center">
+                            You have already chosen two fighters. Remove one to add another fighter.
+                        </v-tooltip>
+
                         <transition name="fade-scale">
                             <div v-if="winLose != -1 && !isNotFightRoute"
                                 class="hb-card__result permanent-marker-regular">
@@ -26,38 +35,31 @@
                                 </div>
                             </div>
                         </transition>
+
                         <v-badge v-if="isSelected && isNotFightRoute"
                             class="hb-card__badge hb-card__badge--bottom hb-animation--slideBottom" content="selected"
                             inline />
-                        <!-- Icono de ojo al hacer hover -->
-                        <transition v-if="isListRoute" name="fade-opacity">
-                            <v-btn v-if="isHovering" class="hb-card__eye-icon" icon variant="tonal" size="large"
-                                @click.stop="goToDetail">
-                                <v-icon>mdi-eye</v-icon>
+
+                        <transition v-if="isNotFightRoute" name="fade-opacity">
+                            <v-btn v-if="isHovering" class="hb-card__image__icon" icon variant="tonal" size="large"
+                                :disabled="!isSelected && selectedCharactersStore.checkIfArrayHasElementsInBothPositions()">
+                                <v-icon
+                                    :icon="isSelected ? 'mdi-minus' : selectedCharactersStore.checkIfArrayHasElementsInBothPositions() ? 'mdi-close' : 'mdi-plus'"></v-icon>
                             </v-btn>
                         </transition>
+
                     </v-img>
                 </div>
-                <div class="hb-card__info ">
-                    <v-card-title class="text-center mt-2">{{ character.name }}</v-card-title>
+                <div class=" hb-card__info ">
+                    <v-card-title class=" text-center mt-2">{{ character.name }}</v-card-title>
                     <v-card-text>
-                        <div v-if="isNotFightRoute" :class="{ 'my-4': isDetailRoute }"
+                        <div v-if="isListRoute" :class="{ 'my-4': isDetailRoute }"
                             class="d-flex justify-center align-center w-100">
-                            <v-tooltip
-                                v-if="!isSelected && selectedCharactersStore.checkIfArrayHasElementsInBothPositions()"
-                                activator="parent" width="200" location="top">You have already chosen two fighters.
-                                Remove
-                                one to add
-                                another fighter.
-                            </v-tooltip>
-
-                            <v-btn variant="tonal" size="small" @click.stop="toggleSelection()"
-                                :disabled="!isSelected && selectedCharactersStore.checkIfArrayHasElementsInBothPositions()">
-
-
-                                <span>{{ isSelected ? 'Remove' : 'Add to fight' }}</span>
+                            <v-btn variant="tonal" size="small" @click.stop="goToDetail">
+                                <span>View details</span>
                             </v-btn>
                         </div>
+
                         <div v-if="isCharacterStats" class="px-4 px-sm-1 py-md-0 h-100">
                             <CharacterStats :character="character" density="compact" />
                         </div>
@@ -75,67 +77,67 @@
 </template>
 
 <script setup lang="ts">
-// Vue & Utilities
-import { computed, ref } from "vue";
-import { useRouter } from 'vue-router';
-const isHovering = ref(false);
+    // Vue & Utilities
+    import { computed, ref } from "vue";
+    import { useRouter } from 'vue-router';
+    const isHovering = ref(false);
 
-// Components
-import CharacterStats from "@/components/character/CharacterStats.vue";
+    // Components
+    import CharacterStats from "@/components/character/CharacterStats.vue";
 
-// Models
-import { CharacterModel } from '@/models/character.model';
+    // Models
+    import { CharacterModel } from '@/models/character.model';
 
-// Pinia Stores
-import { useSelectedCharactersStore } from "@/stores/selectedCharactersStore";
+    // Pinia Stores
+    import { useSelectedCharactersStore } from "@/stores/selectedCharactersStore";
+    const selectedCharactersStore = useSelectedCharactersStore();
 
-const selectedCharactersStore = useSelectedCharactersStore();
-const router = useRouter();
+    const router = useRouter();
 
-// Props
-const props = defineProps({
-    character: { type: Object as () => CharacterModel, required: true },
-    characterNum: { type: Number, required: true },
-    index: { type: Number, required: true },
-    isCharacterStats: { type: Boolean, default: true },
-    isCharacterPublisher: { type: Boolean, default: true },
-    compact: { type: Boolean, default: false },
-    winLose: { type: Number, default: -1 },
-    mode: { type: String, default: 'default' }
-});
+    // Props
+    const props = defineProps({
+        character: { type: Object as () => CharacterModel, required: true },
+        characterNum: { type: Number, required: true },
+        index: { type: Number, required: true },
+        isCharacterStats: { type: Boolean, default: true },
+        isCharacterPublisher: { type: Boolean, default: true },
+        compact: { type: Boolean, default: false },
+        winLose: { type: Number, default: -1 },
+        mode: { type: String, default: 'default' }
+    });
 
-// Computed properties
-const isSelected = computed(() =>
-    selectedCharactersStore.selectedCharacters.some((c: CharacterModel) => c?.id === props.character?.id)
-);
+    // Computed properties
+    const isSelected = computed(() =>
+        selectedCharactersStore.selectedCharacters.some((c: CharacterModel) => c?.id === props.character?.id)
+    );
 
-const isNotFightRoute = computed(() => router?.currentRoute.value.name !== 'Fight');
-const isListRoute = computed(() => router?.currentRoute.value.name === 'List');
-const isDetailRoute = computed(() => router?.currentRoute.value.name === 'Detail');
+    const isNotFightRoute = computed(() => router?.currentRoute.value.name !== 'Fight');
+    const isListRoute = computed(() => router?.currentRoute.value.name === 'List');
+    const isDetailRoute = computed(() => router?.currentRoute.value.name === 'Detail');
 
-const cardSelectedClass = computed(() => ({
-    'selected': isSelected.value && isNotFightRoute.value,
-    'hb-card--selected': isSelected.value && isNotFightRoute.value
-}));
+    const cardSelectedClass = computed(() => ({
+        'selected': isSelected.value && isNotFightRoute.value,
+        'hb-card--selected': isSelected.value && isNotFightRoute.value
+    }));
 
-const badgePositionClass = computed(() => props.index === 1 ? 'hb-card__badge--left' : 'hb-card__badge--right');
+    const badgePositionClass = computed(() => props.index === 1 ? 'hb-card__badge--left' : 'hb-card__badge--right');
 
-// Methods
-const toggleSelection = () => {
-    isSelected.value
-        ? selectedCharactersStore.removeCharacter(props.character)
-        : selectedCharactersStore.addCharacter(props.character);
-};
+    // Methods
+    const toggleSelection = () => {
+        isSelected.value
+            ? selectedCharactersStore.removeCharacter(props.character)
+            : selectedCharactersStore.addCharacter(props.character);
+    };
 
-const getRank = (character: CharacterModel) => {
-    if (!character || !character.powerstats) return 0;
-    const { intelligence = 0, strength = 0, speed = 0, durability = 0, power = 0, combat = 0 } = character.powerstats;
-    return Math.round((intelligence + strength + speed + durability + power + combat) / 6);
-};
+    const getRank = (character: CharacterModel) => {
+        if (!character || !character.powerstats) return 0;
+        const { intelligence = 0, strength = 0, speed = 0, durability = 0, power = 0, combat = 0 } = character.powerstats;
+        return Math.round((intelligence + strength + speed + durability + power + combat) / 6);
+    };
 
-const goToDetail = () => {
-    if (props.character) {
-        router.push({ name: 'Detail', params: { id: props.character.id.toString() } });
-    }
-};
+    const goToDetail = () => {
+        if (props.character) {
+            router.push({ name: 'Detail', params: { id: props.character.id.toString() } });
+        }
+    };
 </script>

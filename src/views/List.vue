@@ -7,16 +7,16 @@
           prepend-inner-icon="mdi-magnify" density="compact" clearable @click:clear="clearSearch"></v-text-field>
       </v-col>
       <v-col>
-        <v-select bg-color="white" flat v-model="selectedRace" label="Race" :items="races" density="compact"
-          clearable></v-select>
+        <v-autocomplete bg-color="white" flat v-model="selectedRace" label="Race" :items="races" density="compact"
+          clearable theme="default"></v-autocomplete>
       </v-col>
       <v-col>
-        <v-select bg-color="white" v-model="selectedAlignment" label="Alignment" :items="alignments" density="compact"
-          clearable></v-select>
+        <v-autocomplete bg-color="white" v-model="selectedAlignment" label="Alignment" :items="alignments"
+          density="compact" clearable></v-autocomplete>
       </v-col>
       <v-col>
-        <v-select bg-color="white" v-model="selectedPublisher" label="Publisher" :items="publishers" density="compact"
-          clearable></v-select>
+        <v-autocomplete bg-color="white" v-model="selectedPublisher" label="Publisher" :items="publishers"
+          density="compact" clearable></v-autocomplete>
       </v-col>
     </v-row>
 

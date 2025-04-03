@@ -12,6 +12,10 @@ export const useStatsPlayerStore = defineStore("player", {
 				wins: 0,
 				loses: 0,
 				playerId: 1,
+				playerIsAuto: false,
+				fightTime: 20,
+				handicap: 0.5,
+				difficult: 2,
 				battles: [] as BattleModel[], // Array de batallas vacío si no hay datos previos
 			};
 		}
@@ -23,6 +27,11 @@ export const useStatsPlayerStore = defineStore("player", {
 			this.playerId = playerId;
 			this.wins = 0;
 			this.loses = 0;
+			this.playerIsAuto = false;
+			this.fightTime = 20;
+			this.handicap = 1;
+			this.difficult = 1;
+			this.battles = [];
 			this.saveToLocalStorage();
 		},
 
@@ -63,36 +72,60 @@ export const useStatsPlayerStore = defineStore("player", {
 			this.saveToLocalStorage(); // Guardamos el estado en localStorage después de agregar la batalla
 		},
 
-		// Obtiene las batallas almacenadas en el estado
-		getBattles() {
-			return this.battles;
-		},
-
 		// Resetea la información del jugador y guarda en localStorage
 		resetPlayer() {
 			this.wins = 0;
 			this.loses = 0;
+			this.playerIsAuto = false;
+			this.fightTime = 20;
+			this.handicap = 1;
+			this.difficult = 1;
 			this.battles = [];
 			this.saveToLocalStorage();
 		},
 
 		// Función para borrar las batallas del localStorage
 		clearBattlesFromLocalStorage() {
-			this.wins = 0;
-			this.loses = 0;
 			this.battles = []; // Limpiamos las batallas en el estado
 			this.saveToLocalStorage(); // Guardamos el estado actualizado (sin batallas) en localStorage
 		},
 
+		// Cambia el estado de `playerIsAuto`
+		toggleAutoPlay() {
+			this.playerIsAuto = !this.playerIsAuto;
+			this.saveToLocalStorage();
+		},
+
+		// Configura el tiempo de combate
+		setFightTime(time: number) {
+			this.fightTime = time;
+			this.saveToLocalStorage();
+		},
+
+		// Ajusta el hándicap
+		setHandicap(value: number) {
+			this.handicap = value;
+			this.saveToLocalStorage();
+		},
+
+		// Ajusta la dificultad
+		setDifficult(level: number) {
+			this.difficult = level;
+			this.saveToLocalStorage();
+		},
+
 		// Función para guardar el estado en localStorage
 		saveToLocalStorage() {
-			// Guardamos el estado en localStorage después de cualquier cambio
 			localStorage.setItem(
 				"playerStats",
 				JSON.stringify({
 					wins: this.wins,
 					loses: this.loses,
 					playerId: this.playerId,
+					playerIsAuto: this.playerIsAuto,
+					fightTime: this.fightTime,
+					handicap: this.handicap,
+					difficult: this.difficult,
 					battles: this.battles,
 				})
 			);

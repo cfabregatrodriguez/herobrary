@@ -38,7 +38,7 @@
 		}
 	}
 	&--fight--0 {
-		transform: perspective(500px) rotateY(10deg);
+		transform: perspective(450px) rotateY(10deg);
 		transform-origin: center;
 		animation: slideLeftPerspective 0.5s cubic-bezier(0.5, -0.2, 0.3, 1.2);
 	}
@@ -113,7 +113,7 @@
 		}
 	}
 
-	&__eye-icon {
+	&__image__icon {
 		position: absolute;
 		top: 50%;
 		left: 50%;
@@ -164,7 +164,7 @@
 	}
 	&--bottom {
 		bottom: 0px;
-		margin-left: calc(-25% + 20px);
+		justify-self: anchor-center;
 		background-color: rgba(var(--v-theme-accent), 1);
 		.v-badge__badge {
 			padding: 2px 4px;

@@ -8,6 +8,7 @@ import { ThemeDefinition } from "vuetify"; // Importa ThemeDefinition
 const primary = "#0f0f10";
 const primaryDark = "#0f0f10";
 const primaryLight = "#3b3b43";
+const primaryAltLight = "#60606c";
 
 // Configura Vuetify
 const hbTheme: ThemeDefinition = {
@@ -36,8 +37,8 @@ const hbTheme: ThemeDefinition = {
 		drawer: primary, // Color para el cajón lateral (drawer)
 		footer: primary, // Color para el pie de página (footer)
 		button: primary, // Color para botones
-		link: primary, // Color para enlaces (links)
-		disabled: primary, // Color para elementos deshabilitados
+		link: primaryLight, // Color para enlaces (links)
+		disabled: primaryAltLight, // Color para elementos deshabilitados
 		divider: primary, // Color para divisores (líneas)
 
 		"surface-bright": primaryLight,

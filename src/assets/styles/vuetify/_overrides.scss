@@ -1,7 +1,16 @@
 @use "../abstracts/variables" as *;
 
+body {
+	overflow: hidden;
+	max-width: 100% !important;
+}
+
 .v-application__wrap {
 	min-height: fit-content !important;
+}
+
+.v-main {
+	min-height: 686px;
 }
 
 .v-pagination {
@@ -81,4 +90,38 @@ a {
 	&:hover {
 		text-decoration: none;
 	}
+}
+
+.v-autocomplete__content {
+	.v-list {
+		color: white !important;
+	}
+}
+
+.v-bottom-navigation {
+	padding: 8px;
+	height: 100px !important;
+	&__content {
+		padding-right: 8px;
+		justify-content: end;
+	}
+	.v-btn {
+		color: rgba(var(--v-theme-primary), 1) !important;
+		border-radius: 50% !important;
+		width: 50px !important;
+		height: 50px !important;
+		margin: 0px !important;
+		padding: 0px !important;
+		min-width: 0px !important;
+		:hover {
+			color: rgba(var(--v-theme-primary), 1);
+		}
+	}
+}
+
+.v-slider-track__tick-label {
+	font-size: 12px;
+	margin-top: calc(var(--v-slider-track-size) / 2 + 12px) !important;
+	left: 50%;
+	color: rgba(var(--v-theme-primary), 0.5);
 }
