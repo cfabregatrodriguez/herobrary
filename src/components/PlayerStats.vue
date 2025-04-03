@@ -26,12 +26,27 @@
         <!-- Dropdown Menu -->
         <v-list>
           <v-list-item @click="emit('update:historyDialog', true)">
+            <template v-slot:prepend>
+              <v-icon icon="mdi-history" color="white"></v-icon>
+            </template>
             <v-list-item-title class="text-white">History</v-list-item-title>
           </v-list-item>
           <v-list-item @click="emit('update:settingsDialog', true)" :disabled="countdownStore.isCountdownActive">
+            <template v-slot:prepend>
+              <v-icon icon="mdi-cog-outline" color="white"></v-icon>
+            </template>
             <v-list-item-title class="text-white">Settings</v-list-item-title>
           </v-list-item>
+          <v-list-item href="https://github.com/cfabregatrodriguez/herobrary/tree/main" target="blank">
+            <template v-slot:prepend>
+              <v-icon icon="mdi-github" color="white"></v-icon>
+            </template>
+            <v-list-item-title class="text-white">Github Project</v-list-item-title>
+          </v-list-item>
           <v-list-item @click="emit('update:helpDialog', true)">
+            <template v-slot:prepend>
+              <v-icon icon="mdi-help" color="white"></v-icon>
+            </template>
             <v-list-item-title class="text-white">Help</v-list-item-title>
           </v-list-item>
         </v-list>

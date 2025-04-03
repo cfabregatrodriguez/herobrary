@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="hb-fight__backgroundBar" :style="breakpoint.xs ? 'height: 100%' : ''"></div>
-        <v-row class="flex-column flex-sm-row justify-center align-center">
+        <v-row class="hb-fight__container flex-column flex-sm-row justify-center align-center">
             <!-- Character 1 -->
             <v-col cols="12" sm="6" class="pt-0 pr-0">
                 <Character v-if="selectedCharactersStore.getCharacterByIndex(0)" :mode="'fight'"

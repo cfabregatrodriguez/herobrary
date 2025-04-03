@@ -6,7 +6,7 @@
                     :value="character.powerstats?.intelligence || 0" />
             </v-col>
             <v-col cols="12">
-                <CharacterBarStat :density="density" stat="Strength" icon="mdi-weight" color="red-lighten-1"
+                <CharacterBarStat :density="density" stat="Strength" icon="mdi-dumbbell" color="red-lighten-1"
                     :value="character.powerstats?.strength || 0" />
             </v-col>
             <v-col cols="12">
@@ -22,7 +22,7 @@
                     color="purple-lighten-1" :value="character.powerstats?.power || 0" />
             </v-col>
             <v-col cols="12">
-                <CharacterBarStat :density="density" stat="Combat" icon="mdi-fencing" color="deep-orange-lighten-2"
+                <CharacterBarStat :density="density" stat="Combat" icon="mdi-sword-cross" color="deep-orange-lighten-2"
                     :value="character.powerstats?.combat || 0" />
             </v-col>
         </v-row>
@@ -30,15 +30,15 @@
 </template>
 
 <script setup lang="ts">
-// Components
-import CharacterBarStat from "@/components/character/CharacterBarStat.vue";
+    // Components
+    import CharacterBarStat from "@/components/character/CharacterBarStat.vue";
 
-// Models
-import { CharacterModel } from '@/models/character.model';
+    // Models
+    import { CharacterModel } from '@/models/character.model';
 
-// Props
-const props = defineProps<{
-    character: CharacterModel;
-    density: string;
-}>();
+    // Props
+    const props = defineProps<{
+        character: CharacterModel;
+        density: string;
+    }>();
 </script>

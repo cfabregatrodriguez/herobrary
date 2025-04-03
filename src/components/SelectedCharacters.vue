@@ -22,12 +22,18 @@
         <v-avatar v-else color="#B0BEC5" :size="breakpoint.smAndDown ? '35' : '50'"
           class="hb-avatar-container mt-0"></v-avatar>
       </div>
-      <v-btn :size="breakpoint.smAndDown ? 'x-small' : 'default'"
-        :class="canFight && router.currentRoute.value.name !== 'Fight' ? 'hb-animation--glow' : ''" color="secondary"
-        variant="outlined" class="mx-4" @click="goToCharactersFight"
-        :disabled="countdownStore.isCountdownActive || !canFight || router.currentRoute.value.name == 'Fight'">
-        Start
-      </v-btn>
+      <div>
+        <v-tooltip v-if="!selectedCharactersStore.checkIfArrayHasElementsInBothPositions()" activator="parent"
+          width="150" location="bottom">
+          You need to characters to fight.
+        </v-tooltip>
+        <v-btn :size="breakpoint.smAndDown ? 'x-small' : 'default'"
+          :class="canFight && router.currentRoute.value.name !== 'Fight' ? 'hb-animation--glow' : ''" color="secondary"
+          variant="outlined" class="mx-4" @click="goToCharactersFight"
+          :disabled="countdownStore.isCountdownActive || !canFight || router.currentRoute.value.name == 'Fight'">
+          Start
+        </v-btn>
+      </div>
 
       <div class="d-flex justify-center align-center">
         <!-- Tooltip for selected character (Slot 2) -->

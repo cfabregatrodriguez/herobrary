@@ -19,7 +19,7 @@
                         <v-tooltip
                             v-if="!isSelected && selectedCharactersStore.checkIfArrayHasElementsInBothPositions()"
                             activator="parent" width="200" location="center">
-                            You have already chosen two fighters. Remove one to add another fighter.
+                            You have already chosen two fighters. Remove one in the top bar to add another fighter.
                         </v-tooltip>
 
                         <transition name="fade-scale">

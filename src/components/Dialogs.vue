@@ -188,8 +188,8 @@
 
   // Computed
   const playerIsAuto = computed<boolean>({
-    get: () => statsPlayerStore.playerIsAuto,
-    set: (value) => statsPlayerStore.playerIsAuto = value,
+    get: (): boolean => statsPlayerStore.playerIsAuto,
+    set: (value: boolean): void => statsPlayerStore.setIsAuto(value),
   });
 
   const fightTime = computed<number>({

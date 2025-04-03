@@ -86,6 +86,8 @@ export const useStatsPlayerStore = defineStore("player", {
 
 		// Función para borrar las batallas del localStorage
 		clearBattlesFromLocalStorage() {
+			this.wins = 0;
+			this.loses = 0;
 			this.battles = []; // Limpiamos las batallas en el estado
 			this.saveToLocalStorage(); // Guardamos el estado actualizado (sin batallas) en localStorage
 		},
@@ -93,6 +95,11 @@ export const useStatsPlayerStore = defineStore("player", {
 		// Cambia el estado de `playerIsAuto`
 		toggleAutoPlay() {
 			this.playerIsAuto = !this.playerIsAuto;
+			this.saveToLocalStorage();
+		},
+
+		setIsAuto(value: boolean) {
+			this.playerIsAuto = value;
 			this.saveToLocalStorage();
 		},
 

@@ -12,8 +12,9 @@
                     @updateCounter="handleCounterChange" @filled="handleFilled" :index="index" />
             </div>
             <!-- Character bar fight (conditionally rendered) -->
-            <CharacterBarFight v-if="isCharacterBarFight" :character="character" :counter="counter" :bgColor="bgColor"
-                :isAuto="isAuto" @updateCounter="handleCounterChange" :divisionPassed="divisionPassed" />
+            <CharacterBarFight v-if="isCharacterBarFight" :isPlayer="index" :character="character" :counter="counter"
+                :bgColor="bgColor" :isAuto="isAuto" @updateCounter="handleCounterChange"
+                :divisionPassed="divisionPassed" />
         </div>
     </div>
 </template>

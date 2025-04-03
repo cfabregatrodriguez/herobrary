@@ -37,7 +37,8 @@
     bgColor: { type: String, default: "red" },
     isAuto: { type: Boolean, default: false },
     counter: { type: Number, default: 1 },
-    divisionPassed: { type: Number, default: 1 }
+    divisionPassed: { type: Number, default: 1 },
+    isPlayer: { type: Number, default: 0 }
   });
 
 
@@ -56,7 +57,7 @@
   const maxTotalWidth = ref(0);
   const progressBarRef = ref<InstanceType<typeof VProgressLinear> | null>(null);
   const direction = ref(1);
-  const minibarPos = ref(0);
+  const minibarPos = ref(1);
   const divisionPassedRef = ref(props.divisionPassed);
 
 
@@ -146,6 +147,11 @@
 
 
   // Computed
+  const isAuto = computed<boolean>({
+    get: () => statsPlayerStore.isAuto,
+    set: (value) => statsPlayerStore.setIsAuto(value),
+  });
+
   const handicap = computed<number>({
     get: () => statsPlayerStore.handicap,
     set: (value) => statsPlayerStore.setHandicap(value),
@@ -198,7 +204,24 @@
   });
 
 
-  // Actions
+  // Methods
+  const handleAutoModeChange = (autoMode: boolean) => {
+    if (intervalAutoClicks) {
+      clearInterval(intervalAutoClicks); // Limpiamos el intervalo anterior si existe
+    }
+    if (autoMode || props.isPlayer == 1) {
+      intervalAutoClicks = setInterval(() => {
+        if (countdownStore.isCountdownActive) {
+          updateCounterValueAuto();
+        }
+      }, baseHoldIntervalAuto);
+    } else {
+      window.addEventListener("keydown", handleKeyDown);
+      window.addEventListener("keyup", handleKeyUp);
+    }
+
+  };
+
 
   const updateBarWidth = () => {
     if (!progressBarRef.value) return;
@@ -389,6 +412,12 @@
     divisionPassedRef.value = newValue;
   });
 
+  // Watch para reaccionar a cambios en isAuto
+
+  watch(() => statsPlayerStore.playerIsAuto, (newValue) => {
+    handleAutoModeChange(newValue);
+  });
+
 
   // Lifecycle Hooks
   onMounted(() => {
@@ -396,16 +425,8 @@
     nextTick(updateWidth);
     window.addEventListener("resize", updateBarWidth);
     // Si está en modo auto, establece el intervalo para aumentar o reducir el contador
-    if (props.isAuto) {
-      intervalAutoClicks = setInterval(() => {
-        if (countdownStore.isCountdownActive) {
-          updateCounterValueAuto();
-        }
-      }, baseHoldIntervalAuto);
-    } else {
-      window.addEventListener("keydown", handleKeyDown);
-      window.addEventListener("keyup", handleKeyUp);
-    }
+
+    handleAutoModeChange(statsPlayerStore.playerIsAuto);
 
   });
 
