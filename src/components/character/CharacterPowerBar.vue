@@ -43,93 +43,102 @@
 </template>
 
 <script setup lang="ts">
-// Vue & Utilities
-import { ref, watch, computed, onMounted } from "vue";
+    // Vue & Utilities
+    import { ref, watch, computed, onMounted } from "vue";
 
-// Props
-const props = defineProps({
-    character: {
-        type: Object,
-        required: false
-    },
-    counter: {
-        type: Number,
-        default: 0
-    },
-    bgColor: {
-        type: String,
-        default: "red",
-    },
-    index: {
-        type: Number,
-        default: 0
-    }
-});
-
-// Emits
-const emit = defineEmits<{
-    (event: "filled"): void;
-    (event: "divisionPassed", division: number): void;
-}>();
-
-// Reactive Variables
-
-const powerBarContainer = ref<HTMLElement | null>(null);
-const passedDivisions = ref<number[]>([]);
-const messages = ref<{ [key: number]: boolean }>({});
-
-// Watches
-
-watch(() => props.counter, () => {
-    if (props.counter <= 0) passedDivisions.value = [];
-
-    const rectHeightInSVG = 50 + (props.counter * 2);
-    const rectYInSVG = 1000 - rectHeightInSVG;
-
-    for (let i = 1; i <= numDivisions.value; i++) {
-        const divisionY = getDivisionY(i);
-        if (rectYInSVG <= divisionY && !passedDivisions.value.includes(i)) {
-            passedDivisions.value.push(i);
-            emit('divisionPassed', i);
-            messages.value[i] = true;
-            setTimeout(() => {
-                messages.value[i] = false;
-            }, 500);
+    // Props
+    const props = defineProps({
+        character: {
+            type: Object,
+            required: false
+        },
+        counter: {
+            type: Number,
+            default: 0
+        },
+        bgColor: {
+            type: String,
+            default: "red",
+        },
+        index: {
+            type: Number,
+            default: 0
         }
+    });
+
+
+    // Emits
+    const emit = defineEmits<{
+        (event: "filled"): void;
+        (event: "divisionPassed", division: number): void;
+    }>();
+
+    // Reactive Variables
+
+    const powerBarContainer = ref<HTMLElement | null>(null);
+    const passedDivisions = ref<number[]>([]);
+    const messages = ref<{ [key: number]: boolean }>({});
+
+    // Watches
+
+    watch(() => props.counter, () => {
+        if (props.counter <= 0) passedDivisions.value = [];
+
+        const rectHeightInSVG = 50 + (props.counter * 2);
+        const rectYInSVG = 1000 - rectHeightInSVG;
+
+        for (let i = 1; i <= numDivisions.value; i++) {
+            const divisionY = getDivisionY(i);
+            if (rectYInSVG <= divisionY && !passedDivisions.value.includes(i)) {
+                passedDivisions.value.push(i);
+                emit('divisionPassed', i);
+                messages.value[i] = true;
+                setTimeout(() => {
+                    messages.value[i] = false;
+                }, 500);
+            }
+        }
+
+        if (rectYInSVG <= 0) {
+            emit('filled');
+        }
+    });
+
+    // Computed
+
+    const numDivisions = computed(() => {
+        return props.character?.powerstats?.intelligence
+            ? Math.max(1, Math.ceil(props.character.powerstats.intelligence / 20))
+            : 1;
+    });
+
+
+    // Actions
+
+    function getDivisionY(i: number) {
+        const totalHeight = 1000;
+        const step = totalHeight / (numDivisions.value + 1);
+        return totalHeight - i * step;
     }
 
-    if (rectYInSVG <= 0) {
-        emit('filled');
+    function getRadius(division: number): number {
+        return messages.value[division] ? 100 : 0;
     }
-});
 
-// Computed
+    function getOpacity(division: number): number {
+        return messages.value[division] ? 1 : 0;
+    }
 
-const numDivisions = computed(() => {
-    return props.character?.powerstats?.intelligence
-        ? Math.max(1, Math.ceil(props.character.powerstats.intelligence / 20))
-        : 1;
-});
+    // Expose properties and methods for testing
+    defineExpose({
+        numDivisions,
+        getRadius,
+        getOpacity,
+    });
 
-// Actions
-
-function getDivisionY(i: number) {
-    const totalHeight = 1000;
-    const step = totalHeight / (numDivisions.value + 1);
-    return totalHeight - i * step;
-}
-
-function getRadius(division: number): number {
-    return messages.value[division] ? 100 : 0;
-}
-
-function getOpacity(division: number): number {
-    return messages.value[division] ? 1 : 0;
-}
-
-// Lifecycle Hooks
-onMounted(() => {
-    passedDivisions.value = [];
-});
+    // Lifecycle Hooks
+    onMounted(() => {
+        passedDivisions.value = [];
+    });
 
 </script>

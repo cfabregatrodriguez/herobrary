@@ -15,6 +15,14 @@
 		"isolatedModules": true,
 		"types": ["vitest/globals", "@pinia/testing"]
 	},
-	"include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.d.ts",
+		"src/**/*.tsx",
+		"src/**/*.vue",
+		"tests/CharacterBarFight.test.ts",
+		"tests/CharacterPoweBar.test.ts",
+		"tests/CharacterStats.test.ts"
+	],
 	"exclude": ["node_modules"]
 }

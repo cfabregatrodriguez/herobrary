@@ -83,13 +83,13 @@
     const isHovering = ref(false);
 
     // Components
-    import CharacterStats from "@/components/character/CharacterStats.vue";
+    import CharacterStats from "../../components/character/CharacterStats.vue";
 
     // Models
-    import { CharacterModel } from '@/models/character.model';
+    import { CharacterModel } from '../../models/character.model';
 
     // Pinia Stores
-    import { useSelectedCharactersStore } from "@/stores/selectedCharactersStore";
+    import { useSelectedCharactersStore } from "../../stores/selectedCharactersStore";
     const selectedCharactersStore = useSelectedCharactersStore();
 
     const router = useRouter();
@@ -103,7 +103,11 @@
         isCharacterPublisher: { type: Boolean, default: true },
         compact: { type: Boolean, default: false },
         winLose: { type: Number, default: -1 },
-        mode: { type: String, default: 'default' }
+        mode: { type: String, default: 'default' },
+        isSelected: {
+            type: Boolean,
+            default: false,
+        },
     });
 
     // Computed properties

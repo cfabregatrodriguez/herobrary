@@ -1,6 +1,6 @@
 import { vi, expect, test, describe, beforeEach, afterEach } from "vitest";
 import fetchMock from "fetch-mock";
-import { getCharacter } from "./api";
+import { getCharacter } from "../../src/services/api";
 
 const API_URL = "https://akabab.github.io/superhero-api/api/";
 
