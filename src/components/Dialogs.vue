@@ -5,7 +5,7 @@
       dialog-bottom-transition" max-width="500" opacity=".8">
       <v-toolbar color="primary">
         <v-toolbar-title>How to Play</v-toolbar-title>
-        <v-btn icon="mdi-close"></v-btn>
+        <v-btn icon="mdi-close" @click="emit('update:helpDialog', false)"></v-btn>
       </v-toolbar>
       <v-card color="white">
         <v-card-text>
