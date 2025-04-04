@@ -1,11 +1,11 @@
 <template>
   <div>
     <!-- Help Dialog -->
-    <v-dialog v-model="props.helpDialog" @update:model-value="emit('update:helpDialog', $event)" transition="
+    <v-dialog v-model="helpDialog" @update:model-value="emit('update:helpDialog', $event)" transition="
       dialog-bottom-transition" max-width="500" opacity=".8">
       <v-toolbar color="primary">
         <v-toolbar-title>How to Play</v-toolbar-title>
-        <v-btn icon="mdi-close" @click="emit('update:helpDialog', false)"></v-btn>
+        <v-btn icon="mdi-close"></v-btn>
       </v-toolbar>
       <v-card color="white">
         <v-card-text>
@@ -46,8 +46,7 @@
 
 
     <!-- Battle History Dialog -->
-    <v-dialog v-model="props.historyDialog" @update:model-value="emit('update:historyDialog', $event)"
-      transition="dialog-bottom-transition" width="400" opacity=".8" scrollable>
+    <v-dialog v-model="historyDialog" transition="dialog-bottom-transition" width="400" opacity=".8" scrollable>
       <v-toolbar color="primary">
         <v-toolbar-title>History Battles</v-toolbar-title>
         <v-btn icon="mdi-close" @click="emit('update:historyDialog', false)"></v-btn>
@@ -103,8 +102,7 @@
 
 
     <!-- Settings Dialog -->
-    <v-dialog v-model="props.settingsDialog" @update:model-value="emit('update:settingsDialog', $event)"
-      transition="dialog-bottom-transition" width="720" opacity=".8" scrollable>
+    <v-dialog v-model="settingsDialog" transition="dialog-bottom-transition" width="720" opacity=".8" scrollable>
       <v-toolbar color="primary">
         <v-toolbar-title>Settings</v-toolbar-title>
         <v-btn icon="mdi-close" @click="emit('update:settingsDialog', false)"></v-btn>
@@ -166,6 +164,25 @@
   // Pinia Stores
   import { useStatsPlayerStore } from '@/stores/statsPlayerStore';
   const statsPlayerStore = useStatsPlayerStore();
+
+
+  const emit = defineEmits(["update:helpDialog", "update:historyDialog", "update:settingsDialog"]);
+
+
+  const helpDialog = computed({
+    get: () => props.helpDialog,
+    set: (value) => emit("update:helpDialog", value),
+  });
+
+  const historyDialog = computed({
+    get: () => props.historyDialog,
+    set: (value) => emit("update:historyDialog", value),
+  });
+
+  const settingsDialog = computed({
+    get: () => props.settingsDialog,
+    set: (value) => emit("update:settingsDialog", value),
+  });
 
   // Props
   const props = defineProps({
@@ -248,8 +265,6 @@
       await fetchBattleAvatars();
     }
   });
-
-  const emit = defineEmits(["update:helpDialog", "update:historyDialog", "update:settingsDialog"]);
 
 
 

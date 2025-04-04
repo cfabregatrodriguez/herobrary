@@ -29,12 +29,6 @@ describe("CharacterStats.vue", () => {
 				character,
 				density,
 			},
-			global: {
-				stubs: {
-					// Stub CharacterBarStat to avoid rendering its internals
-					CharacterBarStat: true,
-				},
-			},
 		});
 
 		// Verifica que se renderizan 6 componentes CharacterBarStat
@@ -104,11 +98,6 @@ describe("CharacterStats.vue", () => {
 					images: {}, // Added 'images' property to satisfy CharacterModel type
 				}, // Sin valores en powerstats
 				density,
-			},
-			global: {
-				stubs: {
-					CharacterBarStat: true,
-				},
 			},
 		});
 

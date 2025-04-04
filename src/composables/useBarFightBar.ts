@@ -21,7 +21,6 @@ export function useBarFightBar() {
 
 		// Apply different divisors based on resolvedCharacterId
 		const divisor = resolvedCharacterId === 0 ? 1.3 : 0.95; // Important: this value is the same as the one in the CSS (in &--fight--1 and &--fight--0)
-		console.log(resolvedCharacterId, divisor);
 
 		maxTotalWidth.value = rect.width / divisor || 1;
 		barWidth.value = rect.width / divisor || 1;

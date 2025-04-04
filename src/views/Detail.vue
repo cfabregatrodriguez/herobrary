@@ -49,31 +49,31 @@
 </template>
 
 <script setup lang="ts">
-// Vue & Utilities
-import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
-import { getCharacter } from "@/services/api";
+  // Vue & Utilities
+  import { ref, onMounted } from "vue";
+  import { useRoute } from "vue-router";
+  import { getCharacter } from "@/services/api";
 
-// Components
-import Character from "@/components/Character.vue";
-import { CharacterModel } from '@/models/character.model';
+  // Components
+  import Character from "@/components/Character.vue";
+  import { CharacterModel } from '@/models/character.model';
 
-// Reactive variables with stricter types
-const character = ref<CharacterModel | null>(null);
-const route = useRoute();
-const characterId = route.params.id as string;
+  // Reactive variables
+  const character = ref<CharacterModel | null>(null);
+  const route = useRoute();
+  const characterId = route.params.id as string;
 
-// Fetch character data when the component is mounted
-onMounted(async () => {
-  try {
-    const data = await getCharacter(characterId);
-    if (data && data.id) { // Check if data is valid
-      character.value = data;
-    } else {
-      console.error("Invalid character data");
+  // Lifecycle hooks
+  onMounted(async () => {
+    try {
+      const data = await getCharacter(characterId);
+      if (data && data.id) { // Check if data is valid
+        character.value = data;
+      } else {
+        console.error("Invalid character data");
+      }
+    } catch (error) {
+      console.error("Error fetching character:", error);
     }
-  } catch (error) {
-    console.error("Error fetching character:", error);
-  }
-});
+  });
 </script>

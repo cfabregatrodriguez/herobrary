@@ -1,5 +1,7 @@
+import { ref } from "vue";
+
 export function useBarFightZones() {
-	// Calculates the power zone width based on power and division passed
+	// PowerZone
 	function calculatePowerZone(
 		power: number,
 		maxWidth: number,
@@ -10,7 +12,7 @@ export function useBarFightZones() {
 		};
 	}
 
-	// Calculates the combat zones based on combat stats
+	// CombatZones
 	function calculateCombatZones(
 		combat: number,
 		maxWidth: number,
@@ -40,7 +42,7 @@ export function useBarFightZones() {
 		return combatZones;
 	}
 
-	// Combines power and combat zones and calculates their positions
+	// All zones
 	function calculateZones(
 		power: number,
 		combat: number,
@@ -66,10 +68,9 @@ export function useBarFightZones() {
 			start: number;
 			color: string;
 		}[] = [];
-
-		// Interleave powerZone and combatZones
 		let i = 0;
-		while (i < combatZones.length || i < 1) {
+
+		while (i < powerZone.width || i < combatZones.length) {
 			if (i < combatZones.length) {
 				allZones.push({
 					...combatZones[i],
@@ -87,7 +88,6 @@ export function useBarFightZones() {
 			i++;
 		}
 
-		// Calculate positions and remaining space
 		const totalZonesWidth = allZones.reduce((sum, zone) => sum + zone.width, 0);
 		const remainingSpace = maxWidth - totalZonesWidth;
 		const spaceSize = remainingSpace / (allZones.length + 1);
@@ -98,7 +98,7 @@ export function useBarFightZones() {
 				start: currentPosition,
 				width: zone.width,
 				type: zone.type,
-				color: zone.color,
+				color: zone.type === "power" ? "#ab47bc" : "#ff8a65",
 			};
 			currentPosition += zone.width + spaceSize;
 			return z;

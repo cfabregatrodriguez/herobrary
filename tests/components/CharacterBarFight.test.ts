@@ -31,11 +31,6 @@ describe("CharacterBarFight.vue", () => {
 
 	beforeEach(() => {
 		wrapper = mount(CharacterBarFight, {
-			global: {
-				stubs: {
-					"v-progress-linear": true,
-				},
-			},
 			props: {
 				character: {
 					powerstats: {

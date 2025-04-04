@@ -29,7 +29,7 @@ export const useStatsPlayerStore = defineStore("player", {
 			this.loses = 0;
 			this.playerIsAuto = false;
 			this.fightTime = 20;
-			this.handicap = 1;
+			this.handicap = 0.5;
 			this.difficult = 1;
 			this.battles = [];
 			this.saveToLocalStorage();
@@ -78,7 +78,7 @@ export const useStatsPlayerStore = defineStore("player", {
 			this.loses = 0;
 			this.playerIsAuto = false;
 			this.fightTime = 20;
-			this.handicap = 1;
+			this.handicap = 0.5;
 			this.difficult = 1;
 			this.battles = [];
 			this.saveToLocalStorage();

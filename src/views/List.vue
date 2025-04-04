@@ -50,26 +50,21 @@
   // Pinia Stores
   import { useCountdownStore } from '@/stores/countdownStore';
 
+  // Routing
   const route = useRoute();
+
   const router = useRouter();
 
   // Reactive Variables
   const characters = ref<any[]>([]);
-
   const page = ref(Number(route.query.page) || 1);
-
   const itemsPerPage = 30;
-
   const searchQuery = ref(route.query.search ? String(route.query.search) : "");
-
   const selectedRace = ref(route.query.race ? String(route.query.race) : null);
-
   const selectedAlignment = ref(route.query.alignment ? String(route.query.alignment) : null);
-
   const selectedPublisher = ref(route.query.publisher ? String(route.query.publisher) : null);
 
-
-  // Filter characters based on search query, race, alignment, and publisher
+  // Computed
   const filteredCharacters = computed(() => {
     let filtered = characters.value;
 
@@ -99,7 +94,7 @@
     return filtered;
   });
 
-  // Get unique races, alignments, and publishers sorted alphabetically
+  // Computed
   const races = computed(() => {
     return Array.from(new Set(characters.value.map(c => c.appearance?.race).filter(Boolean))).sort();
   });
@@ -110,23 +105,22 @@
     return Array.from(new Set(characters.value.map(c => c.biography?.publisher).filter(Boolean))).sort();
   });
 
-  // Total pages based on filtered characters
   const totalPages = computed(() => {
     return Math.ceil(filteredCharacters.value.length / itemsPerPage);
   });
 
-  // Get the characters for the current page
   const paginatedCharacters = computed(() => {
     const start = (page.value - 1) * itemsPerPage;
     return filteredCharacters.value.slice(start, start + itemsPerPage);
   });
 
-  // Synchronize filters with URL
+  // Watches
   watch([searchQuery, selectedRace, selectedAlignment, selectedPublisher], () => {
     page.value = 1; // Reset de paginación
     updateQueryParams(); // Actualiza la URL con los nuevos parámetros
   });
 
+  // Methods
   function updateQueryParams() {
     router.replace({
       query: {
@@ -139,14 +133,13 @@
     });
   }
 
-  // Function to clear the search field and reset pagination
   const clearSearch = () => {
     searchQuery.value = "";
     page.value = 1;
     updateQueryParams();
   };
 
-  // Function to load characters from the API
+  // Lifecycle Hooks
   onMounted(async () => {
     const countdownStore = useCountdownStore();
     countdownStore.isCountdownActive = false;
