@@ -4,6 +4,20 @@
 
 Herobrary is an interactive web application that allows users to explore, select, and pit superhero characters against each other in dynamic battles. The application is built with Vue 3, Pinia, Vuetify, and uses a public API to fetch superhero data.
 
+# How to play
+
+1. Go to the character list and select two characters. You can remove them in the top toolbar.
+
+2. Click the "Start" to go to the fight scenary.
+
+3. Click the "Fight" button or tap the spacebar to begin the fight.
+
+4. During the fight:
+   🟧 Orange Zones (Combat): Tap the spacebar repeatedly to strike hard.
+   🟪 Purple Zones (Power): Hold the spacebar to charge your energy.
+
+5. The character with the highest energy at the end wins!
+
 ## Features
 
 - **Explore Characters**: Browse a list of superheroes with advanced filters (search, race, alignment, publisher).
@@ -12,6 +26,7 @@ Herobrary is an interactive web application that allows users to explore, select
 - **Interactive Battles**: Engage in dynamic battles with power zones and combat mechanics.
 - **Battle History**: View the history of won and lost battles.
 - **Player Statistics**: Track wins and losses.
+- **Game settings**: You can change timing, difficulty and autoplay in settings menu.
 
 ## Technologies Used
 

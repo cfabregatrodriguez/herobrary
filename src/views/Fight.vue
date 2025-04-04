@@ -53,8 +53,16 @@
     import { useDisplay } from 'vuetify'
 
 
-    // State: Reactive variables
+    // Reactive variables
     const breakpoint = ref(useDisplay());
+    const counter = ref(0);
+    const counter2 = ref(0);
+    const countdownRef = ref();
+    const bgColor = ref('#3498db');
+    const bgColor2 = ref('red');
+    const totalBarsPassed = ref(0);
+    const winLose = ref(-1);
+    const showFightButton = ref(true);
 
     // Pinia Stores
     import { useStatsPlayerStore } from "@/stores/statsPlayerStore";
@@ -69,16 +77,6 @@
     import Countdown from "@/components/Countdown.vue";
 
     // Props
-
-    // Reactive Variables
-    const counter = ref(0);
-    const counter2 = ref(0);
-    const countdownRef = ref();
-    const bgColor = ref('#3498db');
-    const bgColor2 = ref('red');
-    const totalBarsPassed = ref(0);
-    const winLose = ref(-1);
-    const showFightButton = ref(true);
 
     // Computed
 
@@ -180,6 +178,7 @@
         }
     });
 
+    // Lifecycle hooks
     onMounted(async () => {
 
         window.addEventListener("keydown", handleKeyPress);
