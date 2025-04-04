@@ -36,7 +36,7 @@
         v-model:settingsDialog="settingsDialog"></Dialogs>
     </v-main>
     <v-bottom-navigation bg-color="transparent" elevation="0" class="justify-end">
-      <v-btn color="white" :icon="'mdi-help'" @click="helpDialog = true" flat></v-btn>
+      <v-btn :icon="'mdi-help'" @click="helpDialog = true" flat></v-btn>
     </v-bottom-navigation>
   </v-app>
 </template>

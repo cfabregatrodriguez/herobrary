@@ -47,7 +47,7 @@ export const useSelectedCharactersStore = defineStore("selectedCharacters", {
 		},
 
 		clearSelection() {
-			this.selectedCharacters = [null, null]; // Mantener dos espacios fijos
+			this.selectedCharacters = [null, null];
 			localStorage.setItem(
 				"selectedCharacters",
 				JSON.stringify(this.selectedCharacters)

@@ -3,10 +3,10 @@ import { BattleModel } from "@/models/battle.model";
 
 export const useStatsPlayerStore = defineStore("player", {
 	state: () => {
-		// Inicializa el estado desde localStorage si existen datos guardados
+		// Initialize state from localStorage if saved data exists
 		const storedState = localStorage.getItem("playerStats");
 		if (storedState) {
-			return JSON.parse(storedState); // Parseamos el estado almacenado en localStorage
+			return JSON.parse(storedState); // Parse the state stored in localStorage
 		} else {
 			return {
 				wins: 0,
@@ -16,13 +16,13 @@ export const useStatsPlayerStore = defineStore("player", {
 				fightTime: 20,
 				handicap: 0.5,
 				difficult: 2,
-				battles: [] as BattleModel[], // Array de batallas vacío si no hay datos previos
+				battles: [] as BattleModel[], // Empty battles array if no previous data
 			};
 		}
 	},
 
 	actions: {
-		// Establece la información del jugador y guarda en localStorage
+		// Sets player information and saves to localStorage
 		setPlayerInfo(playerId: string) {
 			this.playerId = playerId;
 			this.wins = 0;
@@ -35,19 +35,19 @@ export const useStatsPlayerStore = defineStore("player", {
 			this.saveToLocalStorage();
 		},
 
-		// Registra una victoria y guarda el estado en localStorage
+		// Records a win and saves the state to localStorage
 		recordWin() {
 			this.wins += 1;
 			this.saveToLocalStorage();
 		},
 
-		// Registra una derrota y guarda el estado en localStorage
+		// Records a loss and saves the state to localStorage
 		recordLoss() {
 			this.loses += 1;
 			this.saveToLocalStorage();
 		},
 
-		// Agrega una batalla y guarda el estado en localStorage
+		// Adds a battle and saves the state to localStorage
 		addBattle(
 			characterId: number,
 			enemyCharacterId: number,
@@ -67,12 +67,12 @@ export const useStatsPlayerStore = defineStore("player", {
 			};
 			this.battles.push(battle);
 			if (this.battles.length > 50) {
-				this.battles.shift(); // Elimina la batalla más antigua
+				this.battles.shift(); // Remove the oldest battle
 			}
-			this.saveToLocalStorage(); // Guardamos el estado en localStorage después de agregar la batalla
+			this.saveToLocalStorage(); // Save the state to localStorage after adding the battle
 		},
 
-		// Resetea la información del jugador y guarda en localStorage
+		// Resets player information and saves to localStorage
 		resetPlayer() {
 			this.wins = 0;
 			this.loses = 0;
@@ -84,15 +84,15 @@ export const useStatsPlayerStore = defineStore("player", {
 			this.saveToLocalStorage();
 		},
 
-		// Función para borrar las batallas del localStorage
+		// Clears battles from localStorage
 		clearBattlesFromLocalStorage() {
 			this.wins = 0;
 			this.loses = 0;
-			this.battles = []; // Limpiamos las batallas en el estado
-			this.saveToLocalStorage(); // Guardamos el estado actualizado (sin batallas) en localStorage
+			this.battles = []; // Clear battles in the state
+			this.saveToLocalStorage(); // Save the updated state (without battles) to localStorage
 		},
 
-		// Cambia el estado de `playerIsAuto`
+		// Toggles the `playerIsAuto` state
 		toggleAutoPlay() {
 			this.playerIsAuto = !this.playerIsAuto;
 			this.saveToLocalStorage();
@@ -103,25 +103,25 @@ export const useStatsPlayerStore = defineStore("player", {
 			this.saveToLocalStorage();
 		},
 
-		// Configura el tiempo de combate
+		// Sets the fight time
 		setFightTime(time: number) {
 			this.fightTime = time;
 			this.saveToLocalStorage();
 		},
 
-		// Ajusta el hándicap
+		// Adjusts the handicap
 		setHandicap(value: number) {
 			this.handicap = value;
 			this.saveToLocalStorage();
 		},
 
-		// Ajusta la dificultad
+		// Adjusts the difficulty
 		setDifficult(level: number) {
 			this.difficult = level;
 			this.saveToLocalStorage();
 		},
 
-		// Función para guardar el estado en localStorage
+		// Saves the state to localStorage
 		saveToLocalStorage() {
 			localStorage.setItem(
 				"playerStats",

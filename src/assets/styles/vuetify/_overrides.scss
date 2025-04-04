@@ -107,6 +107,8 @@ a {
 	}
 	.v-btn {
 		color: rgba(var(--v-theme-primary), 1) !important;
+		background-color: white !important;
+		box-shadow: 0 0 10px 0px rgba(var(--v-theme-primary), 0.3) !important;
 		border-radius: 50% !important;
 		width: 50px !important;
 		height: 50px !important;
@@ -116,6 +118,11 @@ a {
 		:hover {
 			color: rgba(var(--v-theme-primary), 1);
 		}
+		&.v-btn--variant-text {
+			.v-btn__overlay {
+				background: transparent !important;
+			}
+		}
 	}
 }
 
@@ -124,4 +131,10 @@ a {
 	margin-top: calc(var(--v-slider-track-size) / 2 + 12px) !important;
 	left: 50%;
 	color: rgba(var(--v-theme-primary), 0.5);
+}
+
+.v-tooltip {
+	* {
+		font-size: 11px !important;
+	}
 }

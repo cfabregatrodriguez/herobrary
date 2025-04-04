@@ -19,13 +19,16 @@
           <span>{{
             selectedCharacters[0] ? selectedCharacters[0].name : 'Empty Slot' }}</span>
         </v-tooltip>
-        <v-avatar v-else color="#B0BEC5" :size="breakpoint.smAndDown ? '35' : '50'"
-          class="hb-avatar-container mt-0"></v-avatar>
+        <v-avatar v-else color="#B0BEC5" :size="breakpoint.smAndDown ? '35' : '50'" class="hb-avatar-container mt-0">
+          <v-tooltip activator="parent" location="bottom" class="text-center" width="200">
+            choose a character from the list or press the RND button to assign a random character.
+          </v-tooltip>
+        </v-avatar>
       </div>
       <div>
         <v-tooltip v-if="!selectedCharactersStore.checkIfArrayHasElementsInBothPositions()" activator="parent"
-          width="150" location="bottom">
-          You need to characters to fight.
+          width="150" location="bottom" class="text-center">
+          You need 2 characters to fight.
         </v-tooltip>
         <v-btn :size="breakpoint.smAndDown ? 'x-small' : 'default'"
           :class="canFight && router.currentRoute.value.name !== 'Fight' ? 'hb-animation--glow' : ''" color="secondary"
@@ -50,8 +53,11 @@
           </div>
           <span>{{ selectedCharacters[1] ? selectedCharacters[1].name : 'Empty Slot' }}</span>
         </v-tooltip>
-        <v-avatar v-else color="#B0BEC5" :size="breakpoint.smAndDown ? '35' : '50'"
-          class="hb-avatar-container mt-4 mt-md-0"></v-avatar>
+        <v-avatar v-else color="#B0BEC5" :size="breakpoint.smAndDown ? '35' : '50'" class="hb-avatar-container mt-0">
+          <v-tooltip activator="parent" location="bottom" class="text-center" width="200">
+            choose a character from the list or press the RND button to assign a random character.
+          </v-tooltip>
+        </v-avatar>
         <v-btn class="ml-1 mt-0" color="secondary" :disabled="countdownStore.isCountdownActive" size="x-small"
           @click="assignRandomCharacter(1)">RND</v-btn>
       </div>

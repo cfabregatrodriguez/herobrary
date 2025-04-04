@@ -3,7 +3,7 @@
         <div class="hb-fight__backgroundBar" :style="breakpoint.xs ? 'height: 100%' : ''"></div>
         <v-row class="hb-fight__container flex-column flex-sm-row justify-center align-center">
             <!-- Character 1 -->
-            <v-col cols="12" sm="6" class="pt-0 pr-0">
+            <v-col cols="12" sm="5" class="pt-0 pr-0">
                 <Character v-if="selectedCharactersStore.getCharacterByIndex(0)" :mode="'fight'"
                     class="hb-character--fight--0" :character="selectedCharactersStore.getCharacterByIndex(0)"
                     :counter="counter" :bgColor="bgColor" :isAuto="playerIsAuto" @divisionPassed="handleDivisionPassed"
@@ -13,10 +13,10 @@
                     <v-btn color="white">Choose a character</v-btn>
                 </router-link>
             </v-col>
-            <v-col cols="1">
+            <v-col cols="2">
                 <!-- Fight control and instructions -->
                 <div v-if="selectedCharactersStore.getCharacterByIndex(0) && selectedCharactersStore.getCharacterByIndex(1)"
-                    class="d-flex align-center justify-center hb-countdown-fight ml-0 ml-sm-n11">
+                    class="d-flex align-center justify-center hb-countdown-fight">
                     <div v-if="showFightButton" class="d-block hb-countdown-fight--in my-6">
                         <!-- Button to start the fight -->
                         <v-btn color="secondary" variant="outlined"
@@ -50,15 +50,11 @@
 <script setup lang="ts">
     // Vue & Utilities
     import { ref, onMounted, watch, onUnmounted, computed } from "vue";
-    import { getCharacter } from "@/services/api";
     import { useDisplay } from 'vuetify'
 
 
     // State: Reactive variables
     const breakpoint = ref(useDisplay());
-
-    // Models
-    import { CharacterModel } from '@/models/character.model';
 
     // Pinia Stores
     import { useStatsPlayerStore } from "@/stores/statsPlayerStore";
@@ -186,6 +182,7 @@
 
     onMounted(async () => {
 
+        window.addEventListener("keydown", handleKeyPress);
     });
 
     onUnmounted(() => {
