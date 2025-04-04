@@ -104,7 +104,6 @@ Herobrary is an interactive web application that allows users to explore, select
 │   │   └── index.ts                     # Main routing configuration file
 │   ├── services\                        # Services to consume APIs
 │   │   ├── api.ts                       # Logic to interact with the superhero API
-│   │   ├── api.test.ts                  # Tests for API services
 │   │   └── ...                          # Other services
 │   ├── stores\                          # Global state stores using Pinia
 │   │   ├── countdownStore.ts            # Store to manage the timer state
@@ -121,7 +120,7 @@ Herobrary is an interactive web application that allows users to explore, select
 │   └── shims-vue.d.ts                   # TypeScript shims for Vue files
 ├── tests\                               # Unit and integration tests
 │   ├── components\                      # Tests for components
-│   │   ├── PlayerStats.test.ts          # Test for PlayerStats component
+│   │   ├── CharacterBarFight.test.ts    # Test for PlayerStats component
 │   │   └── ...                          # Other component tests
 │   ├── services\                        # Tests for services
 │   │   ├── api.test.ts                  # Test for API services
