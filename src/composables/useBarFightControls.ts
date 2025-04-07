@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 
 export function useBarFightControls(
 	countdownStore: any,
@@ -36,23 +36,56 @@ export function useBarFightControls(
 		}
 	};
 
-	// Handles the keydown event for the spacebar to start holding
-	const handleKeyDown = (event: KeyboardEvent) => {
+	// Handles both keydown and touchstart events to start holding
+	const handleStart = (event: KeyboardEvent | TouchEvent) => {
 		if (!countdownStore.isCountdownActive) return;
-		if (event.code === "Space") {
-			event.preventDefault();
+
+		// Prevent default behavior for both keyboard and touch events
+		event.preventDefault();
+
+		// Check if the event is a keyboard event and the key is "Space"
+		if (event instanceof KeyboardEvent && event.code === "Space") {
+			startHold();
+		}
+
+		// If it's a touch event, start holding
+		if (event instanceof TouchEvent) {
 			startHold();
 		}
 	};
 
-	// Handles the keyup event for the spacebar to stop holding
-	const handleKeyUp = (event: KeyboardEvent) => {
+	// Handles both keyup and touchend events to stop holding
+	const handleKeyUp = (event: KeyboardEvent | TouchEvent) => {
 		if (!countdownStore.isCountdownActive) return;
-		if (event.code === "Space") {
-			event.preventDefault();
+
+		// Prevent default behavior for both keyboard and touch events
+		event.preventDefault();
+
+		// Check if the event is a keyboard event and the key is "Space"
+		if (event instanceof KeyboardEvent && event.code === "Space") {
+			stopHold();
+		}
+
+		// If it's a touch event, stop holding
+		if (event instanceof TouchEvent) {
 			stopHold();
 		}
 	};
+
+	// Add global event listeners for touch and keyboard events
+	onMounted(() => {
+		window.addEventListener("keydown", handleStart);
+		window.addEventListener("keyup", handleKeyUp);
+		window.addEventListener("touchstart", handleStart, { passive: false }); // Configura como no pasivo
+		window.addEventListener("touchend", handleKeyUp, { passive: false }); // Configura como no pasivo
+	});
+
+	onUnmounted(() => {
+		window.removeEventListener("keydown", handleStart);
+		window.removeEventListener("keyup", handleKeyUp);
+		window.removeEventListener("touchstart", handleStart);
+		window.removeEventListener("touchend", handleKeyUp);
+	});
 
 	return {
 		isHolding,
@@ -60,7 +93,7 @@ export function useBarFightControls(
 		holdTimer,
 		startHold,
 		stopHold,
-		handleKeyDown,
+		handleStart,
 		handleKeyUp,
 	};
 }

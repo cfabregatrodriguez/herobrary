@@ -29,7 +29,7 @@
     <v-main>
 
       <!-- Main content view where nested routes will be rendered -->
-      <div class="py-16">
+      <div>
         <router-view></router-view>
       </div>
       <Dialogs v-model:helpDialog="helpDialog" v-model:historyDialog="historyDialog"

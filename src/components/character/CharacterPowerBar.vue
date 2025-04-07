@@ -3,7 +3,7 @@
         <div class="hb-power-bar__counter permanent-marker-regular">
             {{ Math.round(counter) }}
         </div>
-        <div>
+        <div class="hb-power-bar__in">
             <svg style="left: 5px; bottom: 5px" viewBox="50 0 135 1000" class="wave"
                 :style="{ filter: 'drop-shadow(0 -5px 5px ' + bgColor + ')' }">
                 <defs>

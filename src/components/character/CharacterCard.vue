@@ -60,7 +60,7 @@
                             </v-btn>
                         </div>
 
-                        <div v-if="isCharacterStats" class="px-4 px-sm-1 py-md-0 h-100">
+                        <div v-if="isCharacterStats" v-show="!breakpoint.smAndDown" class="px-4 px-sm-1 py-md-0 h-100">
                             <CharacterStats :character="character" density="compact" />
                         </div>
                     </v-card-text>
@@ -80,6 +80,11 @@
     // Vue & Utilities
     import { computed, ref } from "vue";
     import { useRouter } from 'vue-router';
+    import { useDisplay } from 'vuetify'
+
+
+    //Reactive variables
+    const breakpoint = ref(useDisplay());
     const isHovering = ref(false);
 
     // Components
