@@ -132,7 +132,7 @@
                 <div class="text-caption">Ease of filling the energy bar.</div>
                 <v-slider v-model="handicap" show-ticks="always" step=".1" tick-size="5" prepend-icon="mdi-glass-stange"
                   :ticks="{
-                    0.5: 'Default'
+                    0.3: 'Default'
                   }" thumb-label :min="minHandicap" :max="maxHandicap"></v-slider>
               </div>
             </v-col>
@@ -197,7 +197,7 @@
   const minFightTime = ref(10);
   const maxFightTime = ref(40);
 
-  const minHandicap = ref(0.2);
+  const minHandicap = ref(0.1);
   const maxHandicap = ref(1);
 
   const minDifficult = ref(1);
