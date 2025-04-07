@@ -13,11 +13,12 @@
                     <v-btn color="white">Choose a character</v-btn>
                 </router-link>
             </v-col>
-            <v-col cols="2">
+            <v-col cols="12" sm="2">
                 <!-- Fight control and instructions -->
-                <div v-if="selectedCharactersStore.getCharacterByIndex(0) && selectedCharactersStore.getCharacterByIndex(1)"
+                <div v-if="selectedCharactersStore.getCharacterByIndex(0) &&
+                    selectedCharactersStore.getCharacterByIndex(1)"
                     class="d-flex align-center justify-center hb-countdown-fight">
-                    <div v-if="showFightButton" class="d-block hb-countdown-fight--in my-6">
+                    <div v-if="showFightButton" class="d-block hb-countdown-fight--in my-0 my-sm-6">
                         <!-- Button to start the fight -->
                         <v-btn color="secondary" variant="outlined"
                             class="hb-btn--fight hb-animation--glow permanent-marker-regular" @click="toggleFight"

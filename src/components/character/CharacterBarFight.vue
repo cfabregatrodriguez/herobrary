@@ -118,8 +118,8 @@
   const {
     isHolding,
     holdTimer,
-    handleKeyDown,
-    handleKeyUp
+    handleStart, // Cambia handleKeyDown por handleStart
+    handleKeyUp,
   } = useBarFightControls(countdownStore, updateCounterValue);
 
   const {
@@ -187,7 +187,7 @@
         }
       }, baseHoldIntervalAuto);
     } else {
-      window.addEventListener("keydown", handleKeyDown);
+      window.addEventListener("keydown", handleStart);
       window.addEventListener("keyup", handleKeyUp);
     }
   };
@@ -279,7 +279,7 @@
       updateBarWidth(progressBarRef.value?.$el ?? null, minibarWidth.value, props.isPlayer)
     );
     handleAutoModeChange(statsPlayerStore.playerIsAuto);
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleStart);
     window.addEventListener("keyup", handleKeyUp);
   });
 
@@ -291,7 +291,7 @@
     window.removeEventListener("resize", () =>
       updateBarWidth(progressBarRef.value?.$el ?? null, minibarWidth.value, props.isPlayer)
     );
-    window.removeEventListener("keydown", handleKeyDown);
+    window.removeEventListener("keydown", handleStart);
     window.removeEventListener("keyup", handleKeyUp);
   });
 </script>

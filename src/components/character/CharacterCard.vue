@@ -55,16 +55,16 @@
                     <v-card-text>
                         <div v-if="isListRoute" :class="{ 'my-4': isDetailRoute }"
                             class="d-flex justify-center align-center w-100">
-                            <v-btn variant="tonal" size="small" @click.stop="goToDetail">
+                            <v-btn variant="tonal" :size="breakpoint.xs ? 'x-small' : 'small'" @click.stop="goToDetail">
                                 <span>View details</span>
                             </v-btn>
                         </div>
 
-                        <div v-if="isCharacterStats" class="px-4 px-sm-1 py-md-0 h-100">
+                        <div v-if="isCharacterStats" v-show="!breakpoint.smAndDown" class="px-4 px-sm-1 py-md-0 h-100">
                             <CharacterStats :character="character" density="compact" />
                         </div>
                     </v-card-text>
-                    <v-card-actions class="d-block">
+                    <v-card-actions class="d-block" v-if="!breakpoint.xs">
                         <v-card-subtitle class="pt-2" :class="{ 'pb-2': !isCharacterPublisher }"
                             v-text="character.biography?.fullName || character.name" />
                         <v-card-subtitle v-if="isCharacterPublisher" class="pb-2 text-subtitle-2 opacity-30"
@@ -80,6 +80,11 @@
     // Vue & Utilities
     import { computed, ref } from "vue";
     import { useRouter } from 'vue-router';
+    import { useDisplay } from 'vuetify'
+
+
+    //Reactive variables
+    const breakpoint = ref(useDisplay());
     const isHovering = ref(false);
 
     // Components

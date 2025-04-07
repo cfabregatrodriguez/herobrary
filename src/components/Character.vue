@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="character" :class="['hb-character', `hb-character--${index}`, { 'hb-character--compact': compact }]">
-            <div class="d-sm-flex" :style="index == 1 ? { flexDirection: 'row-reverse' } : { flexDirection: 'row' }">
+            <div class="d-flex" style="flex-direction: row;">
                 <!-- Character card component -->
                 <CharacterCard :character="character" :mode="mode" :characterNum="1" :index="index"
                     :isCharacterStats="isCharacterStats" :isCharacterPublisher="isCharacterPublisher" :compact="compact"
