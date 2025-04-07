@@ -220,10 +220,11 @@
 
 @media #{map.get($display-breakpoints, 'xs')} {
 	.#{$namespace}card {
+		.#{$namespace}card__img {
+			width: 100%;
+			height: 150px;
+		}
 		&--fight {
-			.#{$namespace}card__img {
-				width: 100%;
-			}
 			.#{$namespace}card__info {
 				width: 100%;
 				position: absolute;
