@@ -11,13 +11,13 @@ export const useSelectedCharactersStore = defineStore("selectedCharacters", {
 
 	actions: {
 		addCharacter(character: CharacterModel) {
-			// Verificar si el personaje ya está en el array
+			// Check if the character is already in the array
 			if (
 				!this.selectedCharacters.some(
 					(item: CharacterModel | null) => item?.id === character.id
 				)
 			) {
-				// Buscar la primera posición vacía (null) en el array
+				// Find the first empty position (null) in the array
 				const emptyIndex = this.selectedCharacters.findIndex(
 					(item: CharacterModel | null) => item === null
 				);
@@ -25,7 +25,7 @@ export const useSelectedCharactersStore = defineStore("selectedCharacters", {
 					this.selectedCharacters[emptyIndex] = character;
 				}
 
-				// Guardar en localStorage
+				// Save to localStorage
 				localStorage.setItem(
 					"selectedCharacters",
 					JSON.stringify(this.selectedCharacters)
@@ -34,11 +34,13 @@ export const useSelectedCharactersStore = defineStore("selectedCharacters", {
 		},
 
 		removeCharacter(character: CharacterModel) {
+			// Find the index of the character to remove
 			const index = this.selectedCharacters.findIndex(
 				(item: CharacterModel | null) => item?.id === character.id
 			);
 			if (index > -1) {
 				this.selectedCharacters[index] = null;
+				// Save to localStorage
 				localStorage.setItem(
 					"selectedCharacters",
 					JSON.stringify(this.selectedCharacters)
@@ -47,7 +49,9 @@ export const useSelectedCharactersStore = defineStore("selectedCharacters", {
 		},
 
 		clearSelection() {
+			// Reset the array to [null, null]
 			this.selectedCharacters = [null, null];
+			// Save to localStorage
 			localStorage.setItem(
 				"selectedCharacters",
 				JSON.stringify(this.selectedCharacters)
@@ -55,8 +59,10 @@ export const useSelectedCharactersStore = defineStore("selectedCharacters", {
 		},
 
 		setCharacter(index: number, character: any) {
+			// Set a character at the specified index
 			if (index >= 0 && index < this.selectedCharacters.length) {
 				this.selectedCharacters[index] = character;
+				// Save to localStorage
 				localStorage.setItem(
 					"selectedCharacters",
 					JSON.stringify(this.selectedCharacters)
@@ -65,10 +71,12 @@ export const useSelectedCharactersStore = defineStore("selectedCharacters", {
 		},
 
 		getCharacterByIndex(index: number) {
+			// Return the character at the specified index or null if not found
 			return this.selectedCharacters[index] || null;
 		},
 
 		checkIfArrayHasElementsInBothPositions() {
+			// Check if both positions in the array are filled
 			return (
 				this.selectedCharacters[0] !== null &&
 				this.selectedCharacters[1] !== null
@@ -78,6 +86,7 @@ export const useSelectedCharactersStore = defineStore("selectedCharacters", {
 
 	getters: {
 		isCharacterSelected: (state) => (character: any) => {
+			// Check if a character is already selected
 			return state.selectedCharacters.some(
 				(item: CharacterModel | null) => item?.id === character.id
 			);

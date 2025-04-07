@@ -14,7 +14,7 @@ export const useStatsPlayerStore = defineStore("player", {
 				playerId: 1,
 				playerIsAuto: false,
 				fightTime: 20,
-				handicap: 0.5,
+				handicap: 0.3,
 				difficult: 2,
 				battles: [] as BattleModel[], // Empty battles array if no previous data
 			};
@@ -29,7 +29,7 @@ export const useStatsPlayerStore = defineStore("player", {
 			this.loses = 0;
 			this.playerIsAuto = false;
 			this.fightTime = 20;
-			this.handicap = 0.5;
+			this.handicap = 0.3;
 			this.difficult = 1;
 			this.battles = [];
 			this.saveToLocalStorage();
@@ -78,7 +78,7 @@ export const useStatsPlayerStore = defineStore("player", {
 			this.loses = 0;
 			this.playerIsAuto = false;
 			this.fightTime = 20;
-			this.handicap = 0.5;
+			this.handicap = 0.3;
 			this.difficult = 1;
 			this.battles = [];
 			this.saveToLocalStorage();
